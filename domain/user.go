@@ -6,4 +6,5 @@ type CreateUserRequest struct {
 	JobTitle         string `json:"jobTitle"`
 	CompanyProductId string `json:"companyProductId"`
 	Role             string `json:"role"`
+	CategoryId       string `json:"categoryId"`
 }
