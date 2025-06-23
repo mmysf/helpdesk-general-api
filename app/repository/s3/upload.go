@@ -1,10 +1,11 @@
-package s3repo
+package s3Repo
 
 import (
 	s3_model "app/domain/model/s3"
+	"time"
+
 	"context"
 	"io"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -59,8 +60,8 @@ func (r *s3Repo) UploadFilePrivate(objectKey string, body io.Reader, contentType
 		return
 	}
 
-	url := r.GetPresignedLink(objectKey, expires)
-	if url == "" {
+	url, err := r.GetPresignedLink(objectKey, expires)
+	if err != nil {
 		logrus.Error("UploadFilePrivate: GetPresignedLink error")
 		return
 	}
@@ -68,7 +69,8 @@ func (r *s3Repo) UploadFilePrivate(objectKey string, body io.Reader, contentType
 	uploadData = &s3_model.UploadResponse{
 		Key:         objectKey,
 		ContentType: contentType,
-		URL:         url,
+		URL:         url.URL,
+		ExpiredAt:   url.ExpiredAt,
 	}
 
 	return

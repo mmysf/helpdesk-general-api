@@ -1,0 +1,155 @@
+// company
+{
+  "id": 1,
+  "accessKey": "37a67698-fa95-47a6-a40c-27335e3f92cc",
+  "name": "Company 1",
+  "address": "Address 1",
+  "createdAt": "2021-01-01T00:00:00.000Z",
+  "updatedAt": "2021-01-01T00:00:00.000Z",
+  "deletedAt": null
+}
+
+// company product
+{
+  "id": 1,
+  "company": {
+    "id": 1,
+    "name": "Company 1"
+  },
+  "name": "Product 1",
+  "createdAt": "2021-01-01T00:00:00.000Z",
+  "updatedAt": "2021-01-01T00:00:00.000Z",
+  "deletedAt": null
+}
+
+// customer
+{
+  "id": 1,
+  "company": {
+    "id": 1,
+    "name": "Company 1"
+  },
+  "name": "Customer 1",
+  "email": "someone@mail.com",
+  "password": "password",
+  "token": "token",
+  "isVerified": false,
+  "verifiedAt": null,
+  "createdAt": "2021-01-01T00:00:00.000Z",
+  "updatedAt": "2021-01-01T00:00:00.000Z",
+  "deletedAt": null
+}
+
+// tickets
+{
+  "id": 1,
+  "company": {
+    "id": 1,
+    "name": "Company 1"
+  },
+  "product": {
+    "id": 1,
+    "name": "Product 1"
+  },
+  "customer": {
+    "id": 1,
+    "name": "Customer 1"
+  },
+  "subject": "Ticket 1",
+  "content": "Description 1",
+  "attachments": [
+    {
+      "id": 1,
+      "name": "Attachment 1",
+      "size": "1MB",
+      "url": "https://example.com/attachment1"
+    }
+  ],
+  "log_time": {
+    "startAt": null,
+    "endAt": null,
+    "durationInSeconds": 0,
+    "status": "not_started" // not_started | running | done
+  },
+  "status": "open",
+  "createdAt": "2021-01-01T00:00:00.000Z",
+  "updatedAt": "2021-01-01T00:00:00.000Z",
+  "deletedAt": null
+}
+
+// attachments
+{
+  "id": 1,
+  "company": {
+    "id": 1,
+    "name": "Company 1"
+  },
+  "name": "Attachment 1",
+  "provider": "s3",
+  "providerKey": "/images/2024/07/attachment1.jpg",
+  "type": "image",
+  "size": "1MB",
+  "url": "https://example.com/attachment1",
+  "createdAt": "2021-01-01T00:00:00.000Z",
+  "updatedAt": "2021-01-01T00:00:00.000Z",
+  "deletedAt": null
+}
+
+// agents
+{
+  "id": 1,
+  "name": "Agent 1",
+  "email": "agent1@mail.com",
+  "password": "password",
+  "createdAt": "2021-01-01T00:00:00.000Z",
+  "updatedAt": "2021-01-01T00:00:00.000Z",
+  "deletedAt": null
+}
+
+// ticket comments
+{
+  "id": 1,
+  "company": {
+    "id": 1,
+    "name": "Company 1"
+  },
+  "product": {
+    "id": 1,
+    "name": "Product 1"
+  },
+  "ticket": {
+    "id": 1,
+    "subject": "Ticket 1"
+  },
+  "agent": {
+    "id": 1,
+    "name": "Agent 1"
+  },
+  "customer": {
+    "id": 1,
+    "name": "Customer 1"
+  },
+  "sender": "agent", // agent | customer
+  "content": "Comment 1",
+  "attachments": [
+    {
+      "id": 1,
+      "name": "Attachment 1",
+      "size": "1MB",
+      "url": "https://example.com/attachment1"
+    }
+  ],
+  "createdAt": "2021-01-01T00:00:00.000Z",
+  "updatedAt": "2021-01-01T00:00:00.000Z",
+  "deletedAt": null
+}
+
+// superuser 
+{
+  "name": "Superuser",
+  "email": "superuser@mail.com",
+  "password": "bcrypt",
+  "createdAt": ISODate(),
+  "updatedAt": ISODate(),
+  "deletedAt": null
+}

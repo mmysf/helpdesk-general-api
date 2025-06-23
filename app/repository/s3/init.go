@@ -1,4 +1,4 @@
-package s3repo
+package s3Repo
 
 import (
 	s3_model "app/domain/model/s3"
@@ -56,8 +56,8 @@ func NewS3Repo() S3Repo {
 }
 
 type S3Repo interface {
-	GetPresignedLink(objectKey string, expires *time.Duration) string
 	GetPublicLink(objectKey string) string
+	GetPresignedLink(objectKey string, expires *time.Duration) (uploadData *s3_model.UploadResponse, err error)
 	UploadFilePublic(objectKey string, body io.Reader, contentType string) (uploadData *s3_model.UploadResponse, err error)
 	UploadFilePrivate(objectKey string, body io.Reader, contentType string, expires *time.Duration) (uploadData *s3_model.UploadResponse, err error)
 }

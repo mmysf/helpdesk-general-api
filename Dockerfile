@@ -15,9 +15,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflag
 
 # final image
 FROM alpine
-
-# copy the binary from the builder image
 COPY --from=builder /home/build-app .
-
-# run the binary
-ENTRYPOINT ./build-app
+EXPOSE 5050
+ENTRYPOINT ["./build-app"]

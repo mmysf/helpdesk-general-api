@@ -13,7 +13,7 @@ type routeHandler struct {
 	Middleware middleware.Middleware
 }
 
-func NewRouteHandler(route *gin.RouterGroup, middleware middleware.Middleware, u usecase_member.AppUsecase) {
+func NewCustomerHandler(route *gin.RouterGroup, middleware middleware.Middleware, u usecase_member.AppUsecase) {
 	handler := &routeHandler{
 		Usecase:    u,
 		Route:      route,
@@ -21,4 +21,18 @@ func NewRouteHandler(route *gin.RouterGroup, middleware middleware.Middleware, u
 	}
 
 	handler.handleAuthRoute("/auth")
+	handler.handleTicketRoute("/ticket")
+	handler.handleProductRoute("/product")
+	handler.handleAttachmentRoute("/attachment")
+	handler.handleDashboardRoute("/dashboard")
+	handler.handleOrderRoute("/order")
+	handler.handleHourPackageRoute("/package/hour")
+	handler.handleCustomerSubscriptionRoute("/customer-subscription")
+	handler.handleUserRoute("/user")
+	handler.handleProjectRoute("/project")
+	handler.handleCompanyRoute("/company")
+	handler.handleSettingRoute("/setting")
+	handler.handleTicketCategoryRoute("/ticket-category")
+	handler.handleServerPackageRoute("/package/server")
+	handler.handleConfigRoute("/config")
 }

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	mongorepo "app/app/repository/mongo"
 	"app/helpers"
 	"io"
 	"os"
@@ -12,8 +13,13 @@ import (
 )
 
 type appMiddleware struct {
-	secret string
-	cache  CacheConfig
+	secretKeyCustomer   string
+	secretKeyAgent      string
+	secretKeySuperuser  string
+	secretKeySuperadmin string
+	xenditWebhookToken  string
+	cache               CacheConfig
+	mongo               mongorepo.MongoDBRepo
 }
 
 type CacheConfig struct {
@@ -24,7 +30,7 @@ type CacheConfig struct {
 	cachePrefix string
 }
 
-func NewMiddleware(redis *redis.Client) Middleware {
+func NewMiddleware(redis *redis.Client, mongo mongorepo.MongoDBRepo) Middleware {
 	ttl, _ := time.ParseDuration(os.Getenv("REDIS_TTL"))
 	// default ttl redis
 	if ttl == 0 {
@@ -35,7 +41,12 @@ func NewMiddleware(redis *redis.Client) Middleware {
 	redisKeyPrefix := os.Getenv("REDIS_KEY_PREFIX")
 
 	return &appMiddleware{
-		secret: helpers.GetJWTSecretKey(),
+		mongo:               mongo,
+		secretKeyCustomer:   helpers.GetJWTSecretKeyCustomer(),
+		secretKeyAgent:      helpers.GetJWTSecretKeyAgent(),
+		secretKeySuperuser:  helpers.GetJWTSecretKeySuperuser(),
+		secretKeySuperadmin: helpers.GetJWTSecretKeySuperadmin(),
+		xenditWebhookToken:  os.Getenv("XENDIT_WEBHOOK_VERIFICATION_TOKEN"),
 		cache: CacheConfig{
 			enabled:     useRedis,
 			store:       redis,
@@ -53,9 +64,12 @@ func NewMiddleware(redis *redis.Client) Middleware {
 }
 
 type Middleware interface {
-	Auth() gin.HandlerFunc
-	Cors() gin.HandlerFunc
+	AuthCustomer() gin.HandlerFunc
+	AuthAgent() gin.HandlerFunc
+	AuthSuperadmin() gin.HandlerFunc
+	Role(allowedRoles ...string) gin.HandlerFunc
 	Logger(writer io.Writer) gin.HandlerFunc
 	Recovery() gin.HandlerFunc
 	Cache(expiry ...time.Duration) gin.HandlerFunc
+	VerifyXenditWebhookToken() gin.HandlerFunc
 }

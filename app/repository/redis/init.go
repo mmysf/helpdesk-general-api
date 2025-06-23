@@ -28,7 +28,7 @@ func NewRedisRepo(Conn *redis.Client) RedisRepo {
 
 	return &redisRepo{
 		Conn:       Conn,
-		Prefix:     redisKeyPrefix + "appc:",
+		Prefix:     redisKeyPrefix,
 		UseRedis:   useRedis,
 		DefaultTTL: ttl,
 	}
