@@ -95,6 +95,9 @@ func (u *superadminUsecase) CreateAgent(ctx context.Context, claim domain.JWTCla
 	} else if !helpers.IsValidEmail(payload.Email) {
 		errValidation["email"] = "email field is invalid"
 	}
+	if payload.Category == "" {
+		errValidation["category"] = "category field is required"
+	}
 
 	if len(errValidation) > 0 {
 		return response.ErrorValidation(errValidation, "error validation")
@@ -122,17 +125,33 @@ func (u *superadminUsecase) CreateAgent(ctx context.Context, claim domain.JWTCla
 		return response.Error(http.StatusBadRequest, "email already registered")
 	}
 
+	//check category
+	category, err := u.mongodbRepo.FetchOneTicketCategory(ctx, map[string]interface{}{
+		"id":        payload.Category,
+		"companyID": payload.CompanyID,
+	})
+	if err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+	if category == nil {
+		return response.Error(http.StatusBadRequest, "category not found")
+	}
+
 	// get from config
 	config := u._CacheConfig(ctx)
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(helpers.RandomString(5)), bcrypt.DefaultCost)
 
 	newAgent := model.Agent{
-		ID:        primitive.NewObjectID(),
-		Name:      payload.Name,
-		Email:     payload.Email,
-		Password:  string(hashedPassword),
-		Role:      model.AgentRole,
+		ID:       primitive.NewObjectID(),
+		Name:     payload.Name,
+		Email:    payload.Email,
+		Password: string(hashedPassword),
+		Role:     model.AgentRole,
+		Category: model.TicketCategoryFK{
+			ID:   payload.Category,
+			Name: category.Name,
+		},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

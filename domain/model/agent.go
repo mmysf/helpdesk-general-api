@@ -16,6 +16,7 @@ type Agent struct {
 	ProfilePicture     MediaFK            `bson:"profilePicture" json:"profilePicture"`
 	Bio                string             `bson:"bio" json:"bio"`
 	Role               UserRole           `bson:"role" json:"role"`
+	Category           TicketCategoryFK   `bson:"category" json:"category"`
 	LastActivityAt     *time.Time         `bson:"lastActivityAt" json:"lastActivityAt"`
 	PasswordResetToken string             `bson:"passwordResetToken" json:"-"`
 	CreatedAt          time.Time          `bson:"createdAt" json:"createdAt"`
