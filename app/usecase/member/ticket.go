@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (u *appUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimUser, query url.Values) response.Base {
+func (u *appUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimUser, query url.Values) response.Base { 
 	ctx, cancel := context.WithTimeout(ctx, u.contextTimeout)
 	defer cancel()
 

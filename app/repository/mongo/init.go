@@ -29,6 +29,7 @@ type mongoDBRepo struct {
 	MediaCollection                  string
 	TicketCategoryCollection         string
 	ServerPackageCollection          string
+	NotificationCollection  string
 }
 
 func NewMongodbRepo(Conn *mongo.Database) MongoDBRepo {
@@ -53,6 +54,7 @@ func NewMongodbRepo(Conn *mongo.Database) MongoDBRepo {
 		MediaCollection:                  "medias",
 		TicketCategoryCollection:         "ticket_categories",
 		ServerPackageCollection:          "server_packages",
+		NotificationCollection:   "notification",
 	}
 }
 
@@ -193,4 +195,11 @@ type MongoDBRepo interface {
 	UpdateServerPackage(ctx context.Context, ServerPackages *model.ServerPackage) (err error)
 	DeleteServerPackage(ctx context.Context, ServerPackages *model.ServerPackage) (err error)
 	UpdatePartialServerPackage(ctx context.Context, options map[string]interface{}, field map[string]interface{}) (err error)
+
+	// Notification
+	CountNotification(ctx context.Context, options map[string]interface{}) int64
+	CreateNotification(ctx context.Context, row *model.Notification) (err error)
+	DeleteNotification(ctx context.Context, notification *model.Notification) (err error)
+	UpdateNotification(ctx context.Context, notification *model.Notification) (err error)
+	FetchNotificationList(ctx context.Context, options map[string]interface{}) (cursor *mongo.Cursor, err error)
 }
