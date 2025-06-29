@@ -415,6 +415,11 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 		agentEmails = append(agentEmails, row.Email)
 	}
 
+	// create notification
+	if err := u._createNotification(ctx, ticket, &ticket.Company); err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+
 	// send notification
 	go _sendTicketNotfication(config, ticket, agentEmails, company)
 
@@ -427,6 +432,41 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 	})
 
 	return response.Success(ticket)
+}
+
+func (u *appUsecase) _createNotification(ctx context.Context, ticket *model.Ticket, company *model.CompanyNested) (err error) {
+	// notif
+	var title string
+	var content string
+
+	title = "New ticket created"
+	content = ticket.Subject
+
+	// create notification
+	notification := &model.Notification{
+		ID:       primitive.NewObjectID(),
+		Company:  model.CompanyNested{ID: company.ID, Name: company.Name},
+		Title:    title,
+		Content:  content,
+		IsRead:   false,
+		UserRole: model.AgentRole,
+		User:     model.UserNested(ticket.Customer),
+		Type:     model.TicketUpdated,
+		Ticket: model.TicketNested{
+			ID:      ticket.ID.Hex(),
+			Subject: ticket.Subject,
+		},
+		Category:  *ticket.Category,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	if err := u.mongodbRepo.CreateNotification(ctx, notification); err != nil {
+		logrus.Error(err)
+	}
+
+	return nil
+
 }
 
 func _sendTicketNotfication(config model.Config, ticket *model.Ticket, agentEmails []string, company *model.Company) {

@@ -1355,7 +1355,59 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 		}
 	}
 
+	// create notification
+	if err := u._createNotification(ctx, ticket, &ticket.Company); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (u *agentUsecase) _createNotification(ctx context.Context, ticket *model.Ticket, company *model.CompanyNested) (err error) {
+	// notif
+	var title string
+	var content string
+
+	if ticket.Status == model.Open {
+		title = "Status ticket change"
+		content = "Ticket opened"
+	}
+
+	if ticket.Status == model.InProgress {
+		title = "Status ticket change"
+		content = "Ticket in progress"
+	}
+
+	if ticket.Status == model.Resolve {
+		title = "Status ticket change"
+		content = "Ticket resolved"
+	}
+
+	// create notification
+	notification := &model.Notification{
+		ID:       primitive.NewObjectID(),
+		Company:  model.CompanyNested{ID: company.ID, Name: company.Name},
+		Title:    title,
+		Content:  content,
+		IsRead:   false,
+		UserRole: model.AgentRole,
+		User:     model.UserNested(ticket.Customer),
+		Type:     model.TicketUpdated,
+		Ticket: model.TicketNested{
+			ID:      ticket.ID.Hex(),
+			Subject: ticket.Subject,
+		},
+		Category:  *ticket.Category,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	if err := u.mongodbRepo.CreateNotification(ctx, notification); err != nil {
+		logrus.Error(err)
+	}
+
+	return nil
+
 }
 
 func _sendConfirmCloseTicketNotification(config model.Config, ticket *model.Ticket, company *model.Company) {

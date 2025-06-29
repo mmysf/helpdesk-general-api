@@ -124,4 +124,10 @@ type AgentUsecase interface {
 	CreateTicketCategory(ctx context.Context, claim domain.JWTClaimAgent, payload domain.TicketCategoryRequest) response.Base
 	UpdateTicketCategory(ctx context.Context, claim domain.JWTClaimAgent, id string, payload domain.TicketCategoryRequest) response.Base
 	DeleteTicketCategory(ctx context.Context, claim domain.JWTClaimAgent, id string) response.Base
+
+	// Notification
+	GetNotificationList(ctx context.Context, claim domain.JWTClaimAgent, query url.Values) response.Base
+	GetNotificationDetail(ctx context.Context, claim domain.JWTClaimAgent, id string) response.Base
+	ReadAllNotification(ctx context.Context, claim domain.JWTClaimAgent) response.Base
+	GetNotificationCount(ctx context.Context, claim domain.JWTClaimAgent) response.Base
 }
