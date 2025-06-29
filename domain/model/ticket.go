@@ -26,6 +26,7 @@ type Ticket struct {
 	Token        string               `bson:"token" json:"-"`
 	DetailTime   DetailTime           `bson:"detailTime" json:"detailTime"`
 	Parent       *TicketNested        `bson:"parent" json:"parent"`
+	CompletedBy  *AgentNested         `bson:"completedBy" json:"completedBy"`
 	ClosedAt     *time.Time           `bson:"closedAt" json:"closedAt"`
 	CreatedAt    time.Time            `bson:"createdAt" json:"createdAt"`
 	UpdatedAt    time.Time            `bson:"updatedAt" json:"updatedAt"`
