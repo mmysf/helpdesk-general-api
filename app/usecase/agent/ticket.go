@@ -1274,6 +1274,12 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 
 			ticket.LogTime.EndAt = &now
 
+			//get agent
+			ticketAgent, err := u.mongodbRepo.FetchOneAgent(ctx, map[string]interface{}{"id": agent.ID})
+			if err != nil {
+				return err
+			}
+
 			//init logs end time
 			logsEndAt := now
 
@@ -1298,9 +1304,21 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 			ticket.ReminderSent = true
 			ticket.Token = defaultToken
 			ticket.Status = model.Resolve
+			ticket.CompletedBy = &model.AgentNested{
+				ID:    ticketAgent.ID.Hex(),
+				Name:  ticketAgent.Name,
+				Email: ticketAgent.Email,
+			}
 			ticket.UpdatedAt = now
 
+			ticketAgent.TotalTicketCompleted++
+			ticketAgent.UpdatedAt = now
+
 			if err := u.mongodbRepo.UpdateTicket(ctx, ticket); err != nil {
+				return err
+			}
+
+			if err := u.mongodbRepo.UpdateAgent(ctx, ticketAgent); err != nil {
 				return err
 			}
 
