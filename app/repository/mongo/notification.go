@@ -21,10 +21,6 @@ func generateQueryFilterNotification(options map[string]interface{}, withOptions
 		mongoOptions = helpers.CommonMongoFindOptions(options)
 	}
 
-	if userID, ok := options["userId"]; ok {
-		query["userId"] = userID
-	}
-
 	if isRead, ok := options["isRead"].(bool); ok {
 		query["isRead"] = isRead
 	}
@@ -33,20 +29,12 @@ func generateQueryFilterNotification(options map[string]interface{}, withOptions
 		query["type"] = typ
 	}
 
-	if metaGroupId, ok := options["metaGroupId"].(string); ok {
-		query["meta.schedules.groupID"] = metaGroupId
-	}
-
 	if IsLastTwo, ok := options["isLastTwo"].(bool); ok {
 		query["isLastTwo"] = IsLastTwo
 	}
 
 	if category, ok := options["category"].(string); ok {
-		query["category"] = category
-	}
-
-	if metaStartDate, ok := options["metaStartDate"].(string); ok {
-		query["meta.schedules.appointment.startDate"] = metaStartDate
+		query["category.name"] = category
 	}
 
 	return query, mongoOptions

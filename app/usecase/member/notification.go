@@ -1,4 +1,4 @@
-package usecase_agent
+package usecase_member
 
 import (
 	"app/domain"
@@ -11,7 +11,7 @@ import (
 	yurekaHelpers "github.com/Yureka-Teknologi-Cipta/yureka/helpers"
 )
 
-func (u *agentUsecase) GetNotificationList(ctx context.Context, claim domain.JWTClaimAgent, query url.Values) response.Base {
+func (u *appUsecase) GetNotificationList(ctx context.Context, claim domain.JWTClaimUser, query url.Values) response.Base {
 
 	page, limit, offset := yurekaHelpers.GetLimitOffset(query)
 
@@ -84,7 +84,7 @@ func (u *agentUsecase) GetNotificationList(ctx context.Context, claim domain.JWT
 	)
 }
 
-func (u *agentUsecase) GetNotificationDetail(ctx context.Context, claim domain.JWTClaimAgent, id string) response.Base {
+func (u *appUsecase) GetNotificationDetail(ctx context.Context, claim domain.JWTClaimUser, id string) response.Base {
 	data, err := u.mongodbRepo.FetchOneNotification(ctx, map[string]interface{}{"id": id})
 	if err != nil {
 		return response.Error(500, err.Error())
@@ -96,12 +96,12 @@ func (u *agentUsecase) GetNotificationDetail(ctx context.Context, claim domain.J
 	return response.Success(data)
 }
 
-func (u *agentUsecase) ReadAllNotification(ctx context.Context, claim domain.JWTClaimAgent) response.Base {
+func (u *appUsecase) ReadAllNotification(ctx context.Context, claim domain.JWTClaimUser) response.Base {
 	u.mongodbRepo.ReadAllNotification(ctx, claim.UserID)
 	return response.Success(nil)
 }
 
-func (u *agentUsecase) GetNotificationCount(ctx context.Context, claim domain.JWTClaimAgent) response.Base {
+func (u *appUsecase) GetNotificationCount(ctx context.Context, claim domain.JWTClaimUser) response.Base {
 	unread := u.mongodbRepo.CountNotification(ctx, map[string]interface{}{
 		"isRead": false,
 	})

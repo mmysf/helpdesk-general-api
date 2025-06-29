@@ -122,4 +122,10 @@ type AppUsecase interface {
 
 	// config
 	GetConfig(ctx context.Context) response.Base
+
+	// Notification
+	GetNotificationList(ctx context.Context, claim domain.JWTClaimUser, query url.Values) response.Base
+	GetNotificationDetail(ctx context.Context, claim domain.JWTClaimUser, id string) response.Base
+	ReadAllNotification(ctx context.Context, claim domain.JWTClaimUser) response.Base
+	GetNotificationCount(ctx context.Context, claim domain.JWTClaimUser) response.Base
 }

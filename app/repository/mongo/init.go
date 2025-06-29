@@ -29,7 +29,7 @@ type mongoDBRepo struct {
 	MediaCollection                  string
 	TicketCategoryCollection         string
 	ServerPackageCollection          string
-	NotificationCollection  string
+	NotificationCollection           string
 }
 
 func NewMongodbRepo(Conn *mongo.Database) MongoDBRepo {
@@ -54,7 +54,7 @@ func NewMongodbRepo(Conn *mongo.Database) MongoDBRepo {
 		MediaCollection:                  "medias",
 		TicketCategoryCollection:         "ticket_categories",
 		ServerPackageCollection:          "server_packages",
-		NotificationCollection:   "notification",
+		NotificationCollection:           "notification",
 	}
 }
 
@@ -202,4 +202,6 @@ type MongoDBRepo interface {
 	DeleteNotification(ctx context.Context, notification *model.Notification) (err error)
 	UpdateNotification(ctx context.Context, notification *model.Notification) (err error)
 	FetchNotificationList(ctx context.Context, options map[string]interface{}) (cursor *mongo.Cursor, err error)
+	FetchOneNotification(ctx context.Context, options map[string]interface{}) (*model.Notification, error)
+	ReadAllNotification(ctx context.Context, userID string) (err error)
 }

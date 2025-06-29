@@ -32,4 +32,5 @@ func NewAgentRouteHandler(route *gin.RouterGroup, middleware middleware.Middlewa
 	handler.handleUserRoute("/user")
 	handler.handleConfigRoute("/config")
 	handler.handleTicketCategoryRoute("/ticket-category")
+	handler.handleNotificationRoute("/notification")
 }
