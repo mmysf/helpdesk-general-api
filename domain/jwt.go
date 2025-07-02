@@ -7,13 +7,13 @@ import (
 )
 
 type JWTClaimUser struct {
-	UserID           string                     `json:"userID"`
-	CompanyID        string                     `json:"companyID"`
-	CompanyProductID string                     `json:"companyProductID"`
-	Role             string                     `json:"role"`
-	Company          model.CompanyNested        `json:"-"`
-	CompanyProduct   model.CompanyProductNested `json:"-"`
-	User             model.UserNested           `json:"-"`
+	UserID           string              `json:"userID"`
+	CompanyID        string              `json:"companyID"`
+	CompanyProductID string              `json:"companyProductID"`
+	Role             string              `json:"role"`
+	Company          model.CompanyNested `json:"-"`
+	//CompanyProduct   model.CompanyProductNested `json:"-"`
+	User model.UserNested `json:"-"`
 	jwt.RegisteredClaims
 }
 

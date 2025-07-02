@@ -117,9 +117,6 @@ func (u *superadminUsecase) CreateCustomer(ctx context.Context, claim domain.JWT
 	if payload.CompanyID == "" {
 		errValidation["companyID"] = "companyID field is required"
 	}
-	if payload.CompanyProductID == "" {
-		errValidation["companyProductID"] = "companyProductID field is required"
-	}
 	if len(errValidation) > 0 {
 		return response.ErrorValidation(errValidation, "error validation")
 	}
@@ -149,15 +146,15 @@ func (u *superadminUsecase) CreateCustomer(ctx context.Context, claim domain.JWT
 	}
 
 	// check company product
-	companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
-		"id": payload.CompanyProductID,
-	})
-	if err != nil {
-		return response.Error(http.StatusInternalServerError, err.Error())
-	}
-	if companyProduct == nil {
-		return response.Error(http.StatusBadRequest, "company product not found")
-	}
+	// companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
+	// 	"id": payload.CompanyProductID,
+	// })
+	// if err != nil {
+	// 	return response.Error(http.StatusInternalServerError, err.Error())
+	// }
+	// if companyProduct == nil {
+	// 	return response.Error(http.StatusBadRequest, "company product not found")
+	// }
 
 	// get from config
 	config := u._CacheConfig(ctx)
@@ -169,12 +166,12 @@ func (u *superadminUsecase) CreateCustomer(ctx context.Context, claim domain.JWT
 		Type:  company.Type,
 	}
 
-	newCompanyProductNested := model.CompanyProductNested{
-		ID:    companyProduct.ID.Hex(),
-		Name:  companyProduct.Name,
-		Image: companyProduct.Logo.URL,
-		Code:  companyProduct.Code,
-	}
+	// newCompanyProductNested := model.CompanyProductNested{
+	// 	ID:    companyProduct.ID.Hex(),
+	// 	Name:  companyProduct.Name,
+	// 	Image: companyProduct.Logo.URL,
+	// 	Code:  companyProduct.Code,
+	// }
 
 	isNeedBalance := false
 	subscription := &model.Subscription{}
@@ -197,18 +194,18 @@ func (u *superadminUsecase) CreateCustomer(ctx context.Context, claim domain.JWT
 	}
 
 	newUser := model.Customer{
-		ID:             primitive.NewObjectID(),
-		Company:        newCompanyNested,
-		CompanyProduct: newCompanyProductNested,
-		Name:           payload.Name,
-		Email:          payload.Email,
-		Password:       string(hashedPassword),
-		Role:           model.AdminRole,
-		IsVerified:     true,
-		IsNeedBalance:  isNeedBalance,
-		Subscription:   subscription,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
+		ID:      primitive.NewObjectID(),
+		Company: newCompanyNested,
+		// CompanyProduct: newCompanyProductNested,
+		Name:          payload.Name,
+		Email:         payload.Email,
+		Password:      string(hashedPassword),
+		Role:          model.AdminRole,
+		IsVerified:    true,
+		IsNeedBalance: isNeedBalance,
+		Subscription:  subscription,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	err = u.mongodbRepo.CreateCustomer(ctx, &newUser)
@@ -388,7 +385,7 @@ func (u *superadminUsecase) ImportCustomer(ctx context.Context, claim domain.JWT
 	reader := csv.NewReader(bufio.NewReader(file))
 
 	companyMap := map[string]model.Company{}
-	companyProductMap := map[string]model.CompanyProduct{}
+	// companyProductMap := map[string]model.CompanyProduct{}
 	customers := []*model.Customer{}
 	count := 0
 
@@ -430,19 +427,19 @@ func (u *superadminUsecase) ImportCustomer(ctx context.Context, claim domain.JWT
 			companyMap[record[5]] = *company
 		}
 
-		if _, exists := companyProductMap[record[6]]; !exists {
-			// check company product
-			companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
-				"id": record[6],
-			})
-			if err != nil {
-				return response.Error(http.StatusInternalServerError, err.Error())
-			}
-			if companyProduct == nil {
-				return response.Error(http.StatusBadRequest, "company product not found")
-			}
-			companyProductMap[record[6]] = *companyProduct
-		}
+		// if _, exists := companyProductMap[record[6]]; !exists {
+		// 	// check company product
+		// 	companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
+		// 		"id": record[6],
+		// 	})
+		// 	if err != nil {
+		// 		return response.Error(http.StatusInternalServerError, err.Error())
+		// 	}
+		// 	if companyProduct == nil {
+		// 		return response.Error(http.StatusBadRequest, "company product not found")
+		// 	}
+		// 	companyProductMap[record[6]] = *companyProduct
+		// }
 
 		isNeedBalance := false
 		if companyMap[record[5]].Type == "B2C" {
@@ -460,12 +457,12 @@ func (u *superadminUsecase) ImportCustomer(ctx context.Context, claim domain.JWT
 				Image: companyMap[record[5]].Logo.URL,
 				Type:  companyMap[record[5]].Type,
 			},
-			CompanyProduct: model.CompanyProductNested{
-				ID:    companyProductMap[record[6]].ID.Hex(),
-				Name:  companyProductMap[record[6]].Name,
-				Image: companyProductMap[record[6]].Logo.URL,
-				Code:  companyProductMap[record[6]].Code,
-			},
+			// CompanyProduct: model.CompanyProductNested{
+			// 	ID:    companyProductMap[record[6]].ID.Hex(),
+			// 	Name:  companyProductMap[record[6]].Name,
+			// 	Image: companyProductMap[record[6]].Logo.URL,
+			// 	Code:  companyProductMap[record[6]].Code,
+			// },
 			Name:          record[1],
 			Email:         record[2],
 			JobTitle:      record[3],

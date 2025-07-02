@@ -45,6 +45,10 @@ func generateQueryFilterCompany(options map[string]interface{}, withOptions bool
 		query["name"] = name
 	}
 
+	if code, ok := options["code"].(string); ok {
+		query["code"] = code
+	}
+
 	if q, ok := options["q"].(string); ok {
 		regex := bson.M{
 			"$regex": primitive.Regex{

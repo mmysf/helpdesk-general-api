@@ -65,7 +65,7 @@ type AppUsecase interface {
 	GetTicketCommentDetail(ctx context.Context, claim domain.JWTClaimUser, commentId string) response.Base
 
 	// Product
-	GetProductList(ctx context.Context, claim domain.JWTClaimUser, query url.Values) response.Base
+	// GetProductList(ctx context.Context, claim domain.JWTClaimUser, query url.Values) response.Base
 
 	// Attachment
 	UploadAttachment(ctx context.Context, claim domain.JWTClaimUser, payload domain.UploadAttachment, request *http.Request) response.Base

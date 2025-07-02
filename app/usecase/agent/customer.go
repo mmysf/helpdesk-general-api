@@ -138,20 +138,6 @@ func (u *agentUsecase) CreateCustomer(ctx context.Context, claim domain.JWTClaim
 		errValidation["email"] = "email field is invalid"
 	}
 
-	if payload.JobTitle == "" {
-		errValidation["jobTitle"] = "jobTitle field is required"
-	}
-
-	if payload.CompanyProductId == "" {
-		errValidation["companyProductId"] = "companyProductId field is required"
-	}
-
-	if payload.Role == "" {
-		errValidation["role"] = "role field is required"
-	} else if !helpers.InArrayString(payload.Role, []string{"admin", "customer"}) {
-		errValidation["role"] = "role field must be admin or customer"
-	}
-
 	if len(errValidation) > 0 {
 		return response.ErrorValidation(errValidation, "error validation")
 	}
@@ -166,7 +152,7 @@ func (u *agentUsecase) CreateCustomer(ctx context.Context, claim domain.JWTClaim
 	}
 
 	if customer != nil {
-		return response.Error(http.StatusBadRequest, "email already in use for brand "+customer.CompanyProduct.Name)
+		return response.Error(http.StatusBadRequest, "email already in use")
 	}
 
 	// get company
@@ -180,19 +166,19 @@ func (u *agentUsecase) CreateCustomer(ctx context.Context, claim domain.JWTClaim
 		return response.Error(http.StatusBadRequest, "company not found")
 	}
 
-	// check product
-	product, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
-		"id":        payload.CompanyProductId,
-		"companyID": claim.CompanyID,
-	})
+	// // check product
+	// product, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
+	// 	"id":        payload.CompanyProductId,
+	// 	"companyID": claim.CompanyID,
+	// })
 
-	if err != nil {
-		return response.Error(http.StatusInternalServerError, err.Error())
-	}
+	// if err != nil {
+	// 	return response.Error(http.StatusInternalServerError, err.Error())
+	// }
 
-	if product == nil {
-		return response.Error(http.StatusBadRequest, "product not found")
-	}
+	// if product == nil {
+	// 	return response.Error(http.StatusBadRequest, "product not found")
+	// }
 
 	password := helpers.RandomString(5)
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -225,17 +211,17 @@ func (u *agentUsecase) CreateCustomer(ctx context.Context, claim domain.JWTClaim
 		Name:     payload.Name,
 		Email:    payload.Email,
 		Password: string(hashedPassword),
-		CompanyProduct: model.CompanyProductNested{
-			ID:    product.ID.Hex(),
-			Name:  product.Name,
-			Image: product.Logo.URL,
-			Code:  product.Code,
-		},
+		// CompanyProduct: model.CompanyProductNested{
+		// 	ID:    product.ID.Hex(),
+		// 	Name:  product.Name,
+		// 	Image: product.Logo.URL,
+		// 	Code:  product.Code,
+		// },
 		Company:       claim.Company,
 		IsNeedBalance: isNeedBalance,
 		Subscription:  subscription,
-		JobTitle:      payload.JobTitle,
-		Role:          model.UserRole(payload.Role),
+		JobTitle:      "customer",
+		Role:          "customer",
 		IsVerified:    true,
 		VerifiedAt:    &t,
 		CreatedAt:     time.Now(),
@@ -253,6 +239,10 @@ func (u *agentUsecase) CreateCustomer(ctx context.Context, claim domain.JWTClaim
 
 	go func() {
 		_sendEmailCustomerCrendential(config, *newCustomer, password, *company)
+
+		u.mongodbRepo.IncrementOneCompany(ctx, claim.Company.ID, map[string]int64{
+			"customerTotal": 1,
+		})
 	}()
 
 	return response.Success(newCustomer)
@@ -267,22 +257,11 @@ func (u *agentUsecase) UpdateCustomer(ctx context.Context, claim domain.JWTClaim
 	if payload.Name == "" {
 		errValidation["name"] = "name field is required"
 	}
-	if payload.Email == "" {
-		errValidation["email"] = "email field is required"
-	} else if !helpers.IsValidEmail(payload.Email) {
-		errValidation["email"] = "email field is invalid"
-	}
-	if payload.JobTitle == "" {
-		errValidation["jobTitle"] = "jobTitle field is required"
-	}
-	if payload.CompanyProductId == "" {
-		errValidation["companyProductId"] = "companyProductId field is required"
-	}
-	if payload.Role == "" {
-		errValidation["role"] = "role field is required"
-	} else if !helpers.InArrayString(payload.Role, []string{"admin", "customer"}) {
-		errValidation["role"] = "role field must be admin or customer"
-	}
+	// if payload.Email == "" {
+	// 	errValidation["email"] = "email field is required"
+	// } else if !helpers.IsValidEmail(payload.Email) {
+	// 	errValidation["email"] = "email field is invalid"
+	// }
 
 	if len(errValidation) > 0 {
 		return response.ErrorValidation(errValidation, "error validation")
@@ -300,18 +279,18 @@ func (u *agentUsecase) UpdateCustomer(ctx context.Context, claim domain.JWTClaim
 	}
 
 	// check product
-	product, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
-		"id":        payload.CompanyProductId,
-		"companyID": claim.CompanyID,
-	})
+	// product, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
+	// 	"id":        payload.CompanyProductId,
+	// 	"companyID": claim.CompanyID,
+	// })
 
-	if err != nil {
-		return response.Error(http.StatusInternalServerError, err.Error())
-	}
+	// if err != nil {
+	// 	return response.Error(http.StatusInternalServerError, err.Error())
+	// }
 
-	if product == nil {
-		return response.Error(http.StatusBadRequest, "product not found")
-	}
+	// if product == nil {
+	// 	return response.Error(http.StatusBadRequest, "product not found")
+	// }
 
 	// check customer
 	existingCustomer, err := u.mongodbRepo.FetchOneCustomer(ctx, map[string]interface{}{
@@ -321,29 +300,27 @@ func (u *agentUsecase) UpdateCustomer(ctx context.Context, claim domain.JWTClaim
 		return response.Error(http.StatusInternalServerError, err.Error())
 	}
 	if existingCustomer != nil && existingCustomer.ID.Hex() != customer.ID.Hex() {
-		return response.Error(http.StatusBadRequest, "email already in use for brand "+existingCustomer.CompanyProduct.Name)
+		return response.Error(http.StatusBadRequest, "email already in use ")
 	}
 
 	// update customer
 	customer.Name = payload.Name
 	customer.Email = payload.Email
-	customer.JobTitle = payload.JobTitle
-	customer.CompanyProduct = model.CompanyProductNested{
-		ID:    product.ID.Hex(),
-		Name:  product.Name,
-		Image: product.Logo.URL,
-		Code:  product.Code,
-	}
-	customer.Role = model.UserRole(payload.Role)
+	// customer.CompanyProduct = model.CompanyProductNested{
+	// 	ID:    product.ID.Hex(),
+	// 	Name:  product.Name,
+	// 	Image: product.Logo.URL,
+	// 	Code:  product.Code,
+	// }
 	customer.UpdatedAt = time.Now()
 
 	if err := u.mongodbRepo.UpdateOneCustomer(
 		ctx,
 		map[string]interface{}{"id": customer.ID},
 		map[string]interface{}{
-			"name":      customer.Name,
-			"jobTitle":  customer.JobTitle,
-			"company":   customer.CompanyProduct,
+			"name":     customer.Name,
+			"jobTitle": customer.JobTitle,
+			// "company":   customer.CompanyProduct,
 			"email":     customer.Email,
 			"role":      customer.Role,
 			"updatedAt": customer.UpdatedAt,

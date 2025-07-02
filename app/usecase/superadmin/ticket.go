@@ -519,7 +519,7 @@ func (u *superadminUsecase) ResumeLoggingTicket(ctx context.Context, claim domai
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,

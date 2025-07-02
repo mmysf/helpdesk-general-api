@@ -90,15 +90,15 @@ type MongoDBRepo interface {
 	IncrementOneCompany(ctx context.Context, id string, payload map[string]int64) (err error)
 	DeleteCompany(ctx context.Context, company *model.Company) (err error)
 
-	// CompanyProduct
-	CreateCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
-	UpdateCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
-	UpdatePartialCompanyProduct(ctx context.Context, options map[string]interface{}, field map[string]interface{}) (err error)
-	DeleteCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
-	FetchOneCompanyProduct(ctx context.Context, options map[string]interface{}) (*model.CompanyProduct, error)
-	FetchCompanyProductList(ctx context.Context, options map[string]interface{}) (*mongo.Cursor, error)
-	CountCompanyProduct(ctx context.Context, options map[string]interface{}) int64
-	IncrementOneCompanyProduct(ctx context.Context, id string, payload map[string]int64) (err error)
+	// // CompanyProduct
+	// CreateCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
+	// UpdateCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
+	// UpdatePartialCompanyProduct(ctx context.Context, options map[string]interface{}, field map[string]interface{}) (err error)
+	// DeleteCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
+	// FetchOneCompanyProduct(ctx context.Context, options map[string]interface{}) (*model.CompanyProduct, error)
+	// FetchCompanyProductList(ctx context.Context, options map[string]interface{}) (*mongo.Cursor, error)
+	// CountCompanyProduct(ctx context.Context, options map[string]interface{}) int64
+	// IncrementOneCompanyProduct(ctx context.Context, id string, payload map[string]int64) (err error)
 
 	// Ticket
 	FetchTicketList(ctx context.Context, options map[string]interface{}) (*mongo.Cursor, error)

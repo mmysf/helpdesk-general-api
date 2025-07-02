@@ -420,7 +420,7 @@ func (u *agentUsecase) StartLoggingTicket(ctx context.Context, claim domain.JWTC
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -500,7 +500,7 @@ func (u *agentUsecase) StopLoggingTicket(ctx context.Context, claim domain.JWTCl
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -722,7 +722,7 @@ func (u *agentUsecase) ResumeLoggingTicket(ctx context.Context, claim domain.JWT
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -921,12 +921,12 @@ func (u *agentUsecase) CreateTicketComment(ctx context.Context, claim domain.JWT
 	ticketComment := &model.TicketComment{
 		ID:      primitive.NewObjectID(),
 		Company: claim.Company,
-		Product: model.CompanyProductNested{
-			ID:    ticket.Product.ID,
-			Name:  ticket.Product.Name,
-			Image: ticket.Product.Image,
-			Code:  ticket.Product.Code,
-		},
+		// Product: model.CompanyProductNested{
+		// 	ID:    ticket.Product.ID,
+		// 	Name:  ticket.Product.Name,
+		// 	Image: ticket.Product.Image,
+		// 	Code:  ticket.Product.Code,
+		// },
 		Agent: model.AgentNested{
 			ID:   claim.User.ID,
 			Name: claim.User.Name,
@@ -1165,7 +1165,7 @@ func (u *agentUsecase) EditTimeTrack(ctx context.Context, claim domain.JWTClaimA
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -1208,7 +1208,7 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,
@@ -1248,7 +1248,7 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,
@@ -1478,7 +1478,7 @@ func (u *agentUsecase) ExportTicketsToCSV(ctx context.Context, claim domain.JWTC
 	defer csvWriter.Flush()
 
 	// Write CSV headers
-	err = csvWriter.Write([]string{"ID", "Company", "Product", "Customer", "Subject", "Code", "Status", "Priority", "CreatedAt", "ClosedAt\\n"})
+	err = csvWriter.Write([]string{"ID", "Company", "Customer", "Subject", "Code", "Status", "Priority", "CreatedAt", "ClosedAt\\n"})
 	if err != nil {
 		return response.Error(http.StatusInternalServerError, "Error writing CSV header")
 	}
@@ -1501,7 +1501,7 @@ func (u *agentUsecase) ExportTicketsToCSV(ctx context.Context, claim domain.JWTC
 		row := []string{
 			ticket.ID.Hex(),
 			ticket.Company.Name,
-			ticket.Product.Name,
+			// ticket.Product.Name,
 			ticket.Customer.Name,
 			ticket.Subject,
 			ticket.Code,

@@ -191,9 +191,9 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 			return response.Error(http.StatusBadRequest, "project not found")
 		}
 		// check project owner
-		if project.CompanyProduct.ID != claim.CompanyProductID {
-			return response.Error(http.StatusBadRequest, "project is not owned by company product")
-		}
+		// if project.CompanyProduct.ID != claim.CompanyProductID {
+		// 	return response.Error(http.StatusBadRequest, "project is not owned by company product")
+		// }
 
 		projectFK = &model.ProjectFK{
 			ID:   project.ID.Hex(),
@@ -245,10 +245,10 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 	})
 
 	// generate random char
-	randomChar := helpers.RandomChar(len(claim.CompanyProduct.Code))
+	randomChar := helpers.RandomChar(len(claim.Company.Code))
 
 	// generate ticket code
-	ticketCode := helpers.GenerateFormattedCode(claim.CompanyProduct.Code, countTicket+1, randomChar)
+	ticketCode := helpers.GenerateFormattedCode(claim.Company.Code, countTicket+1, randomChar)
 
 	// get detail cover media
 	ticketAttachments := make([]model.AttachmentFK, 0)
@@ -306,9 +306,9 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 
 	// create ticket
 	ticket := &model.Ticket{
-		ID:       primitive.NewObjectID(),
-		Company:  claim.Company,
-		Product:  claim.CompanyProduct,
+		ID:      primitive.NewObjectID(),
+		Company: claim.Company,
+		// Product:  claim.CompanyProduct,
 		Project:  projectFK,
 		Category: ticketCategoryFK,
 		Customer: model.CustomerFK{
@@ -422,9 +422,9 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 	u.mongodbRepo.IncrementOneCompany(ctx, company.ID.Hex(), map[string]int64{
 		"ticketTotal": 1,
 	})
-	u.mongodbRepo.IncrementOneCompanyProduct(ctx, customer.CompanyProduct.ID, map[string]int64{
-		"ticketTotal": 1,
-	})
+	// u.mongodbRepo.IncrementOneCompanyProduct(ctx, customer.CompanyProduct.ID, map[string]int64{
+	// 	"ticketTotal": 1,
+	// })
 
 	return response.Success(ticket)
 }
@@ -441,7 +441,7 @@ func _sendTicketNotfication(config model.Config, ticket *model.Ticket, agentEmai
 		"customer_name":   ticket.Customer.Name,
 		"ticket_subject":  ticket.Subject,
 		"ticket_priority": string(ticket.Priority),
-		"brand_name":      ticket.Product.Name,
+		// "brand_name":      ticket.Product.Name,
 	}))
 
 	//send mail
@@ -757,7 +757,7 @@ func _sendCloseTicketNotification(config model.Config, ticket *model.Ticket, age
 		"customer_name":   ticket.Customer.Name,
 		"ticket_subject":  ticket.Subject,
 		"ticket_priority": string(ticket.Priority),
-		"brand_name":      ticket.Product.Name,
+		// "brand_name":      ticket.Product.Name,
 	}))
 
 	//send mail
@@ -861,7 +861,7 @@ func (u *appUsecase) CreateTicketComment(ctx context.Context, claim domain.JWTCl
 	ticketComment := &model.TicketComment{
 		ID:      primitive.NewObjectID(),
 		Company: ticket.Company,
-		Product: ticket.Product,
+		// Product: ticket.Product,
 		Customer: model.CustomerFK{
 			ID:    claim.User.ID,
 			Name:  claim.User.Name,
@@ -1143,7 +1143,7 @@ func _sendReopenTicketNotification(config model.Config, ticket *model.Ticket, ag
 		"customer_name":   ticket.Customer.Name,
 		"ticket_subject":  ticket.Subject,
 		"ticket_priority": string(ticket.Priority),
-		"brand_name":      ticket.Product.Name,
+		// "brand_name":      ticket.Product.Name,
 	}))
 
 	//send mail
