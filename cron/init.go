@@ -96,6 +96,8 @@ type CronjobHandler interface {
 
 func (cj *cronjob) Run(runInBackground bool) {
 	cj.SyncExpiredSubscription()
+	cj.AutoCloseResolvedTickets()
+
 
 	// starting cron
 	logrus.Info("Cronjob started")
