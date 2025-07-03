@@ -167,3 +167,17 @@ func (r *mongoDBRepo) CreateManyCustomer(ctx context.Context, rows []*model.Cust
 	}
 	return
 }
+
+func (r *mongoDBRepo) IncrementOneCustomer(ctx context.Context, id string, payload map[string]int64) (err error) {
+	obj, _ := primitive.ObjectIDFromHex(id)
+	_, err = r.Conn.Collection(r.CustomerCollection).UpdateOne(context.Background(), map[string]any{
+		"_id": obj,
+	}, bson.M{
+		"$inc": payload,
+	})
+	if err != nil {
+		logrus.Error("IncrementOneCustomer UpdateOne:", err)
+		return
+	}
+	return
+}

@@ -426,6 +426,10 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 	u.mongodbRepo.IncrementOneCompany(ctx, company.ID.Hex(), map[string]int64{
 		"ticketTotal": 1,
 	})
+
+	u.mongodbRepo.IncrementOneCustomer(ctx, claim.UserID, map[string]int64{
+		"ticketTotal": 1,
+	})
 	// u.mongodbRepo.IncrementOneCompanyProduct(ctx, customer.CompanyProduct.ID, map[string]int64{
 	// 	"ticketTotal": 1,
 	// })

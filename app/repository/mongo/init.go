@@ -68,6 +68,7 @@ type MongoDBRepo interface {
 	UpdateOneCustomer(ctx context.Context, query, payload map[string]interface{}) (err error)
 	UpdatePartialCustomer(ctx context.Context, options, field map[string]interface{}) (err error)
 	UpdateManyPartialCustomer(ctx context.Context, ids []primitive.ObjectID, field map[string]interface{}) (err error)
+	IncrementOneCustomer(ctx context.Context, id string, payload map[string]int64) (err error)
 
 	// Agent
 	FetchOneAgent(ctx context.Context, options map[string]interface{}) (*model.Agent, error)
