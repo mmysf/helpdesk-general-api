@@ -25,6 +25,14 @@ func (u *agentUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimA
 
 	page, limit, offset := yurekahelpers.GetLimitOffset(query)
 
+	//get agent
+	agent, err := u.mongodbRepo.FetchOneAgent(ctx, map[string]interface{}{
+		"id": claim.UserID,
+	})
+	if err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+
 	fetchOptions := map[string]interface{}{
 		"limit":     limit,
 		"offset":    offset,
@@ -32,6 +40,10 @@ func (u *agentUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimA
 	}
 
 	// filtering
+	if agent.Role == "agent" {
+		fetchOptions["categoryID"] = agent.Category.ID
+	}
+
 	if query.Get("sort") != "" {
 		fetchOptions["sort"] = query.Get("sort")
 	}
@@ -1714,25 +1726,25 @@ func (u *agentUsecase) GetTotalTicketCustomer(ctx context.Context, claim domain.
 	defer cancel()
 
 	total := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"companyProductID": options["id"],
-		"companyID":        claim.CompanyID,
+		// "companyProductID": options["id"],
+		"companyID": claim.CompanyID,
 	})
 
 	totalOpen := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"open"},
-		"companyID":        claim.CompanyID,
-		"companyProductID": options["id"],
+		"status":    []string{"open"},
+		"companyID": claim.CompanyID,
+		// "companyProductID": options["id"],
 	})
 
 	totalInProgress := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"in_progress"},
-		"companyID":        claim.CompanyID,
-		"companyProductID": options["id"],
+		"status":    []string{"in_progress"},
+		"companyID": claim.CompanyID,
+		// "companyProductID": options["id"],
 	})
 
 	totalClosed := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"closed"},
-		"companyProductID": options["id"],
+		"status": []string{"closed"},
+		// "companyProductID": options["id"],
 	})
 
 	result := map[string]interface{}{

@@ -507,9 +507,9 @@ func (u *appUsecase) RegisterB2B(ctx context.Context, payload domain.RegisterReq
 		errValidation["password"] = "password field is required"
 	}
 
-	if payload.CompanyProductId == "" {
-		errValidation["companyProductId"] = "companyProductId field is required"
-	}
+	// if payload.CompanyProductId == "" {
+	// 	errValidation["companyProductId"] = "companyProductId field is required"
+	// }
 
 	if payload.AccessKey == "" {
 		errValidation["accessKey"] = "accessKey field is required"

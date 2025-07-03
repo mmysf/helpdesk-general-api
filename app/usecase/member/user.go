@@ -24,10 +24,10 @@ func (u *appUsecase) GetUserList(ctx context.Context, claim domain.JWTClaimUser,
 	page, limit, offset := yurekahelpers.GetLimitOffset(paramQuery)
 
 	fetchOptions := map[string]interface{}{
-		"limit":            limit,
-		"offset":           offset,
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
+		"limit":     limit,
+		"offset":    offset,
+		"companyID": claim.CompanyID,
+		// "companyProductID": claim.CompanyProductID,
 	}
 
 	// filtering

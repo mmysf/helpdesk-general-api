@@ -23,10 +23,9 @@ func (u *appUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimUse
 	page, limit, offset := yurekahelpers.GetLimitOffset(query)
 
 	fetchOptions := map[string]interface{}{
-		"limit":            limit,
-		"offset":           offset,
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
+		"limit":     limit,
+		"offset":    offset,
+		"companyID": claim.CompanyID,
 	}
 
 	// filtering
@@ -180,9 +179,9 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 	var projectFK *model.ProjectFK
 	if payload.ProjectId != "" {
 		project, err := u.mongodbRepo.FetchOneProject(ctx, map[string]interface{}{
-			"id":               payload.ProjectId,
-			"companyID":        claim.CompanyID,
-			"companyProductID": claim.CompanyProductID,
+			"id":        payload.ProjectId,
+			"companyID": claim.CompanyID,
+			// "companyProductID": claim.CompanyProductID,
 		})
 		if err != nil {
 			return response.Error(http.StatusInternalServerError, err.Error())
@@ -239,9 +238,9 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 
 	// count ticket
 	countTicket := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
-		"today":            true,
+		"companyID": claim.CompanyID,
+		// "companyProductID": claim.CompanyProductID,
+		"today": true,
 	})
 
 	// generate random char
@@ -500,9 +499,8 @@ func (u *appUsecase) GetTicketDetail(ctx context.Context, claim domain.JWTClaimU
 
 	// check ticket
 	ticket, err := u.mongodbRepo.FetchOneTicket(ctx, map[string]interface{}{
-		"id":               ticketID,
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
+		"id":        ticketID,
+		"companyID": claim.CompanyID,
 	})
 
 	if err != nil {
@@ -945,11 +943,10 @@ func (u *appUsecase) GetTicketCommentList(ctx context.Context, claim domain.JWTC
 	page, limit, offset := yurekahelpers.GetLimitOffset(query)
 
 	fetchOptions := map[string]interface{}{
-		"limit":            limit,
-		"offset":           offset,
-		"ticketID":         ticketId,
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
+		"limit":     limit,
+		"offset":    offset,
+		"ticketID":  ticketId,
+		"companyID": claim.CompanyID,
 	}
 
 	// filtering

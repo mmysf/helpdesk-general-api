@@ -358,6 +358,9 @@ func (u *agentUsecase) DeleteCustomer(ctx context.Context, claim domain.JWTClaim
 		}); err != nil {
 		return response.Error(http.StatusInternalServerError, err.Error())
 	}
+	u.mongodbRepo.IncrementOneCompany(ctx, claim.Company.ID, map[string]int64{
+		"customerTotal": -1,
+	})
 
 	return response.Success("Customer deleted successfully")
 }
