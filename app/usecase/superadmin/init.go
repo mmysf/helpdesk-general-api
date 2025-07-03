@@ -98,13 +98,13 @@ type SuperadminUsecase interface {
 	UpdateCompany(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
 	DeleteCompany(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
 
-	// company product
-	UploadCompanyProductLogo(ctx context.Context, claim domain.JWTClaimSuperadmin, payload domain.UploadAttachment, request *http.Request) response.Base
-	GetCompanyProductList(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
-	GetCompanyProductDetail(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
-	CreateCompanyProduct(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
-	UpdateCompanyProduct(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
-	DeleteCompanyProduct(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
+	// // company product
+	// UploadCompanyProductLogo(ctx context.Context, claim domain.JWTClaimSuperadmin, payload domain.UploadAttachment, request *http.Request) response.Base
+	// GetCompanyProductList(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
+	// GetCompanyProductDetail(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
+	// CreateCompanyProduct(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
+	// UpdateCompanyProduct(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
+	// DeleteCompanyProduct(ctx context.Context, claim domain.JWTClaimSuperadmin, options map[string]interface{}) response.Base
 
 	// config
 	GetConfig(ctx context.Context) response.Base

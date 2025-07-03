@@ -136,12 +136,12 @@ func (u *appUsecase) CreateProject(ctx context.Context, claim domain.JWTClaimUse
 
 	// create project
 	project := model.Project{
-		ID:             primitive.NewObjectID(),
-		Company:        claim.Company,
-		CompanyProduct: claim.CompanyProduct,
-		Name:           payload.Name,
-		Description:    payload.Description,
-		CreatedAt:      time.Now(),
+		ID:      primitive.NewObjectID(),
+		Company: claim.Company,
+		// CompanyProduct: claim.CompanyProduct,
+		Name:        payload.Name,
+		Description: payload.Description,
+		CreatedAt:   time.Now(),
 		CreatedBy: model.CustomerFK{
 			ID:    claim.User.ID,
 			Name:  claim.User.Name,
@@ -214,10 +214,10 @@ func (u *appUsecase) UpdateProject(ctx context.Context, claim domain.JWTClaimUse
 		return response.Error(http.StatusBadRequest, "invalid customer company")
 	}
 
-	// check company product
-	if customer.CompanyProduct.ID != project.CompanyProduct.ID {
-		return response.Error(http.StatusBadRequest, "invalid customer company product")
-	}
+	// // check company product
+	// if customer.CompanyProduct.ID != project.CompanyProduct.ID {
+	// 	return response.Error(http.StatusBadRequest, "invalid customer company product")
+	// }
 
 	// update project
 	project.Description = payload.Description

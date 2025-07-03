@@ -24,10 +24,10 @@ func (u *appUsecase) GetUserList(ctx context.Context, claim domain.JWTClaimUser,
 	page, limit, offset := yurekahelpers.GetLimitOffset(paramQuery)
 
 	fetchOptions := map[string]interface{}{
-		"limit":            limit,
-		"offset":           offset,
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
+		"limit":     limit,
+		"offset":    offset,
+		"companyID": claim.CompanyID,
+		// "companyProductID": claim.CompanyProductID,
 	}
 
 	// filtering
@@ -158,7 +158,7 @@ func (u *appUsecase) CreateUser(ctx context.Context, claim domain.JWTClaimUser, 
 	}
 
 	if customer != nil {
-		return response.Error(http.StatusBadRequest, "email already in use for brand "+customer.CompanyProduct.Name)
+		return response.Error(http.StatusBadRequest, "email already in use")
 	}
 
 	// get company
@@ -184,20 +184,20 @@ func (u *appUsecase) CreateUser(ctx context.Context, claim domain.JWTClaimUser, 
 
 	// create customer
 	newUser := &model.Customer{
-		ID:             primitive.NewObjectID(),
-		Name:           payload.Name,
-		Email:          payload.Email,
-		Password:       string(hashedPassword),
-		CompanyProduct: claim.CompanyProduct,
-		Company:        claim.Company,
-		IsNeedBalance:  isNeedBalance,
-		Subscription:   nil,
-		JobTitle:       payload.JobTitle,
-		Role:           model.UserRole(payload.Role),
-		IsVerified:     true,
-		VerifiedAt:     &t,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
+		ID:       primitive.NewObjectID(),
+		Name:     payload.Name,
+		Email:    payload.Email,
+		Password: string(hashedPassword),
+		// CompanyProduct: claim.CompanyProduct,
+		Company:       claim.Company,
+		IsNeedBalance: isNeedBalance,
+		Subscription:  nil,
+		JobTitle:      payload.JobTitle,
+		Role:          model.UserRole(payload.Role),
+		IsVerified:    true,
+		VerifiedAt:    &t,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	err = u.mongodbRepo.CreateCustomer(ctx, newUser)
@@ -283,7 +283,7 @@ func (u *appUsecase) UpdateUser(ctx context.Context, claim domain.JWTClaimUser, 
 		return response.Error(http.StatusInternalServerError, err.Error())
 	}
 	if existingCustomer != nil && existingCustomer.Email != customer.Email {
-		return response.Error(http.StatusBadRequest, "email already in use for brand "+existingCustomer.CompanyProduct.Name)
+		return response.Error(http.StatusBadRequest, "email already in use")
 	}
 
 	// update customer

@@ -25,6 +25,14 @@ func (u *agentUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimA
 
 	page, limit, offset := yurekahelpers.GetLimitOffset(query)
 
+	//get agent
+	agent, err := u.mongodbRepo.FetchOneAgent(ctx, map[string]interface{}{
+		"id": claim.UserID,
+	})
+	if err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+
 	fetchOptions := map[string]interface{}{
 		"limit":     limit,
 		"offset":    offset,
@@ -32,6 +40,10 @@ func (u *agentUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimA
 	}
 
 	// filtering
+	if agent.Role == "agent" {
+		fetchOptions["categoryID"] = agent.Category.ID
+	}
+
 	if query.Get("sort") != "" {
 		fetchOptions["sort"] = query.Get("sort")
 	}
@@ -420,7 +432,7 @@ func (u *agentUsecase) StartLoggingTicket(ctx context.Context, claim domain.JWTC
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -500,7 +512,7 @@ func (u *agentUsecase) StopLoggingTicket(ctx context.Context, claim domain.JWTCl
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -722,7 +734,7 @@ func (u *agentUsecase) ResumeLoggingTicket(ctx context.Context, claim domain.JWT
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -921,12 +933,12 @@ func (u *agentUsecase) CreateTicketComment(ctx context.Context, claim domain.JWT
 	ticketComment := &model.TicketComment{
 		ID:      primitive.NewObjectID(),
 		Company: claim.Company,
-		Product: model.CompanyProductNested{
-			ID:    ticket.Product.ID,
-			Name:  ticket.Product.Name,
-			Image: ticket.Product.Image,
-			Code:  ticket.Product.Code,
-		},
+		// Product: model.CompanyProductNested{
+		// 	ID:    ticket.Product.ID,
+		// 	Name:  ticket.Product.Name,
+		// 	Image: ticket.Product.Image,
+		// 	Code:  ticket.Product.Code,
+		// },
 		Agent: model.AgentNested{
 			ID:   claim.User.ID,
 			Name: claim.User.Name,
@@ -1165,7 +1177,7 @@ func (u *agentUsecase) EditTimeTrack(ctx context.Context, claim domain.JWTClaimA
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -1208,7 +1220,7 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,
@@ -1248,7 +1260,7 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,
@@ -1530,7 +1542,7 @@ func (u *agentUsecase) ExportTicketsToCSV(ctx context.Context, claim domain.JWTC
 	defer csvWriter.Flush()
 
 	// Write CSV headers
-	err = csvWriter.Write([]string{"ID", "Company", "Product", "Customer", "Subject", "Code", "Status", "Priority", "CreatedAt", "ClosedAt\\n"})
+	err = csvWriter.Write([]string{"ID", "Company", "Customer", "Subject", "Code", "Status", "Priority", "CreatedAt", "ClosedAt\\n"})
 	if err != nil {
 		return response.Error(http.StatusInternalServerError, "Error writing CSV header")
 	}
@@ -1553,7 +1565,7 @@ func (u *agentUsecase) ExportTicketsToCSV(ctx context.Context, claim domain.JWTC
 		row := []string{
 			ticket.ID.Hex(),
 			ticket.Company.Name,
-			ticket.Product.Name,
+			// ticket.Product.Name,
 			ticket.Customer.Name,
 			ticket.Subject,
 			ticket.Code,
@@ -1714,25 +1726,25 @@ func (u *agentUsecase) GetTotalTicketCustomer(ctx context.Context, claim domain.
 	defer cancel()
 
 	total := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"companyProductID": options["id"],
-		"companyID":        claim.CompanyID,
+		// "companyProductID": options["id"],
+		"companyID": claim.CompanyID,
 	})
 
 	totalOpen := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"open"},
-		"companyID":        claim.CompanyID,
-		"companyProductID": options["id"],
+		"status":    []string{"open"},
+		"companyID": claim.CompanyID,
+		// "companyProductID": options["id"],
 	})
 
 	totalInProgress := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"in_progress"},
-		"companyID":        claim.CompanyID,
-		"companyProductID": options["id"],
+		"status":    []string{"in_progress"},
+		"companyID": claim.CompanyID,
+		// "companyProductID": options["id"],
 	})
 
 	totalClosed := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"closed"},
-		"companyProductID": options["id"],
+		"status": []string{"closed"},
+		// "companyProductID": options["id"],
 	})
 
 	result := map[string]interface{}{

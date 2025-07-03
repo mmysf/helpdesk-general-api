@@ -6,7 +6,6 @@ import (
 	"app/helpers"
 	"context"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/Yureka-Teknologi-Cipta/yureka/response"
@@ -66,16 +65,16 @@ func (u *appUsecase) Login(ctx context.Context, payload domain.LoginRequest) res
 	}
 
 	// check companyProduct
-	companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
-		"id": user.CompanyProduct.ID,
-	})
-	if err != nil {
-		return response.Error(http.StatusInternalServerError, err.Error())
-	}
+	// companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
+	// 	"id": user.CompanyProduct.ID,
+	// })
+	// if err != nil {
+	// 	return response.Error(http.StatusInternalServerError, err.Error())
+	// }
 
-	if companyProduct == nil {
-		return response.Error(http.StatusBadRequest, "companyProduct not found")
-	}
+	// if companyProduct == nil {
+	// 	return response.Error(http.StatusBadRequest, "companyProduct not found")
+	// }
 
 	// check password
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password)); err != nil {
@@ -89,10 +88,10 @@ func (u *appUsecase) Login(ctx context.Context, payload domain.LoginRequest) res
 	// generate token
 	tokenString, err := helpers.GenerateJWTTokenCustomer(domain.JWTClaimUser{
 
-		UserID:           user.ID.Hex(),
-		CompanyID:        user.Company.ID,
-		CompanyProductID: user.CompanyProduct.ID,
-		Role:             string(user.Role),
+		UserID:    user.ID.Hex(),
+		CompanyID: user.Company.ID,
+		// CompanyProductID: user.CompanyProduct.ID,
+		Role: string(user.Role),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        uuid.NewString(),
 			Issuer:    "member",
@@ -156,17 +155,17 @@ func (u *appUsecase) Register(ctx context.Context, payload domain.RegisterReques
 	}
 
 	// check company product
-	companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
-		"id": os.Getenv("B2C_COMPANY_PRODUCT_ID"),
-	})
+	// companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
+	// 	"id": os.Getenv("B2C_COMPANY_PRODUCT_ID"),
+	// })
 
-	if err != nil {
-		return response.Error(http.StatusInternalServerError, err.Error())
-	}
+	// if err != nil {
+	// 	return response.Error(http.StatusInternalServerError, err.Error())
+	// }
 
-	if companyProduct == nil {
-		return response.Error(http.StatusBadRequest, "company product not found")
-	}
+	// if companyProduct == nil {
+	// 	return response.Error(http.StatusBadRequest, "company product not found")
+	// }
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
 
@@ -177,12 +176,12 @@ func (u *appUsecase) Register(ctx context.Context, payload domain.RegisterReques
 		Type:  company.Type,
 	}
 
-	newCompanyProduct := model.CompanyProductNested{
-		ID:    companyProduct.ID.Hex(),
-		Name:  companyProduct.Name,
-		Image: companyProduct.Logo.URL,
-		Code:  companyProduct.Code,
-	}
+	// newCompanyProduct := model.CompanyProductNested{
+	// 	ID:    companyProduct.ID.Hex(),
+	// 	Name:  companyProduct.Name,
+	// 	Image: companyProduct.Logo.URL,
+	// 	Code:  companyProduct.Code,
+	// }
 
 	// check the user
 	existingUser, err := u.mongodbRepo.FetchOneCustomer(ctx, map[string]interface{}{
@@ -246,19 +245,19 @@ func (u *appUsecase) Register(ctx context.Context, payload domain.RegisterReques
 	}
 
 	newUser := model.Customer{
-		ID:             primitive.NewObjectID(),
-		Name:           payload.Name,
-		Email:          payload.Email,
-		Company:        newCompanyNested,
-		CompanyProduct: newCompanyProduct,
-		Password:       string(hashedPassword),
-		Role:           model.AdminRole,
-		IsNeedBalance:  true,
-		Subscription:   &subscription,
-		Token:          defaultToken,
-		IsVerified:     defaultVerified,
-		CreatedAt:      now,
-		UpdatedAt:      now,
+		ID:      primitive.NewObjectID(),
+		Name:    payload.Name,
+		Email:   payload.Email,
+		Company: newCompanyNested,
+		// CompanyProduct: newCompanyProduct,
+		Password:      string(hashedPassword),
+		Role:          model.AdminRole,
+		IsNeedBalance: true,
+		Subscription:  &subscription,
+		Token:         defaultToken,
+		IsVerified:    defaultVerified,
+		CreatedAt:     now,
+		UpdatedAt:     now,
 	}
 
 	err = u.mongodbRepo.CreateCustomer(ctx, &newUser)
@@ -508,9 +507,9 @@ func (u *appUsecase) RegisterB2B(ctx context.Context, payload domain.RegisterReq
 		errValidation["password"] = "password field is required"
 	}
 
-	if payload.CompanyProductId == "" {
-		errValidation["companyProductId"] = "companyProductId field is required"
-	}
+	// if payload.CompanyProductId == "" {
+	// 	errValidation["companyProductId"] = "companyProductId field is required"
+	// }
 
 	if payload.AccessKey == "" {
 		errValidation["accessKey"] = "accessKey field is required"
@@ -534,17 +533,17 @@ func (u *appUsecase) RegisterB2B(ctx context.Context, payload domain.RegisterReq
 	}
 
 	//check company product
-	companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
-		"id": payload.CompanyProductId,
-	})
+	// companyProduct, err := u.mongodbRepo.FetchOneCompanyProduct(ctx, map[string]interface{}{
+	// 	"id": payload.CompanyProductId,
+	// })
 
-	if err != nil {
-		return response.Error(http.StatusInternalServerError, err.Error())
-	}
+	// if err != nil {
+	// 	return response.Error(http.StatusInternalServerError, err.Error())
+	// }
 
-	if companyProduct == nil {
-		return response.Error(http.StatusBadRequest, "company product not found")
-	}
+	// if companyProduct == nil {
+	// 	return response.Error(http.StatusBadRequest, "company product not found")
+	// }
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
 
@@ -555,12 +554,12 @@ func (u *appUsecase) RegisterB2B(ctx context.Context, payload domain.RegisterReq
 		Type:  company.Type,
 	}
 
-	newCompanyProduct := model.CompanyProductNested{
-		ID:    companyProduct.ID.Hex(),
-		Name:  companyProduct.Name,
-		Code:  companyProduct.Code,
-		Image: companyProduct.Logo.ID,
-	}
+	// newCompanyProduct := model.CompanyProductNested{
+	// 	ID:    companyProduct.ID.Hex(),
+	// 	Name:  companyProduct.Name,
+	// 	Code:  companyProduct.Code,
+	// 	Image: companyProduct.Logo.ID,
+	// }
 
 	// check the user
 	existingUser, err := u.mongodbRepo.FetchOneCustomer(ctx, map[string]interface{}{
@@ -610,17 +609,17 @@ func (u *appUsecase) RegisterB2B(ctx context.Context, payload domain.RegisterReq
 
 	newUser := model.Customer{
 
-		ID:             primitive.NewObjectID(),
-		Name:           payload.Name,
-		Email:          payload.Email,
-		Company:        newCompanyNested,
-		CompanyProduct: newCompanyProduct,
-		Password:       string(hashedPassword),
-		Role:           model.CustomerRole,
-		Token:          defaultToken,
-		IsVerified:     defaultVerified,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
+		ID:      primitive.NewObjectID(),
+		Name:    payload.Name,
+		Email:   payload.Email,
+		Company: newCompanyNested,
+		// CompanyProduct: newCompanyProduct,
+		Password:   string(hashedPassword),
+		Role:       model.CustomerRole,
+		Token:      defaultToken,
+		IsVerified: defaultVerified,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 
 	err = u.mongodbRepo.CreateCustomer(ctx, &newUser)

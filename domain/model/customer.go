@@ -7,26 +7,27 @@ import (
 )
 
 type Customer struct {
-	ID                 primitive.ObjectID   `bson:"_id" json:"id"`
-	Company            CompanyNested        `bson:"company" json:"company"`
-	CompanyProduct     CompanyProductNested `bson:"companyProduct" json:"companyProduct"`
-	Name               string               `bson:"name" json:"name"`
-	Email              string               `bson:"email" json:"email"`
-	Password           string               `bson:"password" json:"-"`
-	IsNeedBalance      bool                 `bson:"isNeedBalance" json:"isNeedBalance"`
-	Subscription       *Subscription        `bson:"subscription" json:"subscription"`
-	ProfilePicture     MediaFK              `bson:"profilePicture" json:"profilePicture"`
-	JobTitle           string               `bson:"jobTitle" json:"jobTitle"`
-	Bio                string               `bson:"bio" json:"bio"`
-	Role               UserRole             `bson:"role" json:"role"`
-	Token              string               `bson:"token" json:"-"`
-	PasswordResetToken string               `bson:"passwordResetToken" json:"-"`
-	IsVerified         bool                 `bson:"isVerified" json:"isVerified"`
-	VerifiedAt         *time.Time           `bson:"verifiedAt" json:"-"`
-	LastActivityAt     *time.Time           `bson:"lastActivityAt" json:"lastActivityAt"`
-	CreatedAt          time.Time            `bson:"createdAt" json:"createdAt"`
-	UpdatedAt          time.Time            `bson:"updatedAt" json:"updatedAt"`
-	DeletedAt          *time.Time           `bson:"deletedAt" json:"-"`
+	ID      primitive.ObjectID `bson:"_id" json:"id"`
+	Company CompanyNested      `bson:"company" json:"company"`
+	// CompanyProduct     CompanyProductNested `bson:"companyProduct" json:"companyProduct"`
+	Name               string        `bson:"name" json:"name"`
+	Email              string        `bson:"email" json:"email"`
+	Password           string        `bson:"password" json:"-"`
+	IsNeedBalance      bool          `bson:"isNeedBalance" json:"isNeedBalance"`
+	Subscription       *Subscription `bson:"subscription" json:"subscription"`
+	ProfilePicture     MediaFK       `bson:"profilePicture" json:"profilePicture"`
+	JobTitle           string        `bson:"jobTitle" json:"jobTitle"`
+	Bio                string        `bson:"bio" json:"bio"`
+	Role               UserRole      `bson:"role" json:"role"`
+	TickeTotal         int64         `bson:"ticketTotal" json:"ticketTotal"`
+	Token              string        `bson:"token" json:"-"`
+	PasswordResetToken string        `bson:"passwordResetToken" json:"-"`
+	IsVerified         bool          `bson:"isVerified" json:"isVerified"`
+	VerifiedAt         *time.Time    `bson:"verifiedAt" json:"-"`
+	LastActivityAt     *time.Time    `bson:"lastActivityAt" json:"lastActivityAt"`
+	CreatedAt          time.Time     `bson:"createdAt" json:"createdAt"`
+	UpdatedAt          time.Time     `bson:"updatedAt" json:"updatedAt"`
+	DeletedAt          *time.Time    `bson:"deletedAt" json:"-"`
 }
 
 type CustomerFK struct {

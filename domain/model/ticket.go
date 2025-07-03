@@ -7,30 +7,30 @@ import (
 )
 
 type Ticket struct {
-	ID           primitive.ObjectID   `bson:"_id" json:"id"`
-	Company      CompanyNested        `bson:"company" json:"company"`
-	Product      CompanyProductNested `bson:"product" json:"product"`
-	Project      *ProjectFK           `bson:"project" json:"project"`
-	Category     *TicketCategoryFK    `bson:"category" json:"category"`
-	Customer     CustomerFK           `bson:"customer" json:"customer"`
-	Agent        []AgentNested        `bson:"agents" json:"agents"`
-	AssignedToMe *bool                `bson:"-" json:"assignedToMe,omitempty"`
-	Subject      string               `bson:"subject" json:"subject"`
-	Content      string               `bson:"content" json:"content"`
-	Code         string               `bson:"code" json:"code"`
-	Attachments  []AttachmentFK       `bson:"attachments" json:"attachments"`
-	LogTime      LogTime              `bson:"logTime" json:"logTime"`
-	Priority     TicketPriority       `bson:"priority" json:"priority"`
-	Status       TicketStatus         `bson:"status" json:"status"`
-	ReminderSent bool                 `bson:"reminderSent" json:"reminderSent"`
-	Token        string               `bson:"token" json:"-"`
-	DetailTime   DetailTime           `bson:"detailTime" json:"detailTime"`
-	Parent       *TicketNested        `bson:"parent" json:"parent"`
-	CompletedBy  *AgentNested         `bson:"completedBy" json:"completedBy"`
-	ClosedAt     *time.Time           `bson:"closedAt" json:"closedAt"`
-	CreatedAt    time.Time            `bson:"createdAt" json:"createdAt"`
-	UpdatedAt    time.Time            `bson:"updatedAt" json:"updatedAt"`
-	DeletedAt    *time.Time           `bson:"deletedAt" json:"-"`
+	ID      primitive.ObjectID `bson:"_id" json:"id"`
+	Company CompanyNested      `bson:"company" json:"company"`
+	// Product      CompanyProductNested `bson:"product" json:"product"`
+	Project      *ProjectFK        `bson:"project" json:"project"`
+	Category     *TicketCategoryFK `bson:"category" json:"category"`
+	Customer     CustomerFK        `bson:"customer" json:"customer"`
+	Agent        []AgentNested     `bson:"agents" json:"agents"`
+	AssignedToMe *bool             `bson:"-" json:"assignedToMe,omitempty"`
+	Subject      string            `bson:"subject" json:"subject"`
+	Content      string            `bson:"content" json:"content"`
+	Code         string            `bson:"code" json:"code"`
+	Attachments  []AttachmentFK    `bson:"attachments" json:"attachments"`
+	LogTime      LogTime           `bson:"logTime" json:"logTime"`
+	Priority     TicketPriority    `bson:"priority" json:"priority"`
+	Status       TicketStatus      `bson:"status" json:"status"`
+	ReminderSent bool              `bson:"reminderSent" json:"reminderSent"`
+	Token        string            `bson:"token" json:"-"`
+	DetailTime   DetailTime        `bson:"detailTime" json:"detailTime"`
+	Parent       *TicketNested     `bson:"parent" json:"parent"`
+	CompletedBy  *AgentNested      `bson:"completedBy" json:"completedBy"`
+	ClosedAt     *time.Time        `bson:"closedAt" json:"closedAt"`
+	CreatedAt    time.Time         `bson:"createdAt" json:"createdAt"`
+	UpdatedAt    time.Time         `bson:"updatedAt" json:"updatedAt"`
+	DeletedAt    *time.Time        `bson:"deletedAt" json:"-"`
 }
 
 type TicketStatus string
@@ -52,18 +52,18 @@ type TicketNested struct {
 }
 
 type TicketComment struct {
-	ID          primitive.ObjectID   `bson:"_id" json:"id"`
-	Company     CompanyNested        `bson:"company" json:"company"`
-	Product     CompanyProductNested `bson:"product" json:"product"`
-	Ticket      TicketNested         `bson:"ticket" json:"ticket"`
-	Agent       AgentNested          `bson:"agent" json:"agent"`
-	Customer    CustomerFK           `bson:"customer" json:"customer"`
-	Sender      SenderType           `bson:"sender" json:"sender"` // agent | customer
-	Content     string               `bson:"content" json:"content"`
-	Attachments []AttachmentFK       `bson:"attachments" json:"attachments"`
-	CreatedAt   time.Time            `bson:"createdAt" json:"createdAt"`
-	UpdatedAt   time.Time            `bson:"updatedAt" json:"updatedAt"`
-	DeletedAt   *time.Time           `bson:"deletedAt" json:"-"`
+	ID      primitive.ObjectID `bson:"_id" json:"id"`
+	Company CompanyNested      `bson:"company" json:"company"`
+	// Product     CompanyProductNested `bson:"product" json:"product"`
+	Ticket      TicketNested   `bson:"ticket" json:"ticket"`
+	Agent       AgentNested    `bson:"agent" json:"agent"`
+	Customer    CustomerFK     `bson:"customer" json:"customer"`
+	Sender      SenderType     `bson:"sender" json:"sender"` // agent | customer
+	Content     string         `bson:"content" json:"content"`
+	Attachments []AttachmentFK `bson:"attachments" json:"attachments"`
+	CreatedAt   time.Time      `bson:"createdAt" json:"createdAt"`
+	UpdatedAt   time.Time      `bson:"updatedAt" json:"updatedAt"`
+	DeletedAt   *time.Time     `bson:"deletedAt" json:"-"`
 }
 
 type SenderType string
