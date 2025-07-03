@@ -46,6 +46,10 @@ func (u *superadminUsecase) GetCompanyList(ctx context.Context, claim domain.JWT
 		fetchOptions["q"] = paramQuery.Get("q")
 	}
 
+	if paramQuery.Get("search") != "" {
+		fetchOptions["search"] = paramQuery.Get("search")
+	}
+
 	// count first
 	totalDocuments := u.mongodbRepo.CountCompany(ctx, fetchOptions)
 

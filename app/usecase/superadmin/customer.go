@@ -55,6 +55,10 @@ func (u *superadminUsecase) GetCustomers(ctx context.Context, claim domain.JWTCl
 		fetchOptions["type"] = query.Get("type")
 	}
 
+	if query.Get("search") != "" {
+		fetchOptions["search"] = query.Get("search")
+	}
+
 	// count first
 	totalCustomers := u.mongodbRepo.CountCustomer(ctx, fetchOptions)
 	if totalCustomers == 0 {

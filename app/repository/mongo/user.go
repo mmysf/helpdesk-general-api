@@ -51,6 +51,16 @@ func generateQueryFilterCustomer(options map[string]interface{}, withOptions boo
 		query["companyProduct.id"] = companyProductID
 	}
 
+	if search, ok := options["search"].(string); ok {
+		regex := bson.M{
+			"$regex": primitive.Regex{
+				Pattern: search,
+				Options: "i",
+			},
+		}
+		query["name"] = regex
+	}
+
 	if q, ok := options["q"].(string); ok {
 		regex := bson.M{
 			"$regex": primitive.Regex{
