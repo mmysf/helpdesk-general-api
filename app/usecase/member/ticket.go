@@ -448,7 +448,7 @@ func (u *appUsecase) _createNotification(ctx context.Context, ticket *model.Tick
 		Title:    title,
 		Content:  content,
 		IsRead:   false,
-		UserRole: model.AgentRole,
+		UserRole: model.CustomerRole,
 		User:     model.UserNested(ticket.Customer),
 		Type:     model.TicketUpdated,
 		Ticket: model.TicketNested{

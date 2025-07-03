@@ -33,6 +33,14 @@ func generateQueryFilterNotification(options map[string]interface{}, withOptions
 		query["isLastTwo"] = IsLastTwo
 	}
 
+	if userRole := options["userRole"]; userRole != nil {
+		query["userRole"] = userRole
+	}
+
+	if userID, ok := options["userID"].(string); ok {
+		query["user.id"] = userID
+	}
+
 	if category, ok := options["category"].(string); ok {
 		query["category.name"] = category
 	}

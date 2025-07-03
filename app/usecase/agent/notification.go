@@ -16,11 +16,12 @@ func (u *agentUsecase) GetNotificationList(ctx context.Context, claim domain.JWT
 	page, limit, offset := yurekaHelpers.GetLimitOffset(query)
 
 	fetchOptions := map[string]interface{}{
-		"limit":  limit,
-		"offset": offset,
-		"page":   page,
-		"sort":   "createdAt",
-		"dir":    "desc",
+		"limit":    limit,
+		"offset":   offset,
+		"page":     page,
+		"sort":     "createdAt",
+		"dir":      "desc",
+		"userRole": "customer",
 	}
 
 	// filtering
