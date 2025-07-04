@@ -18,6 +18,7 @@ type Ticket struct {
 	Subject      string            `bson:"subject" json:"subject"`
 	Content      string            `bson:"content" json:"content"`
 	Code         string            `bson:"code" json:"code"`
+	Name         string            `bson:"name" json:"name"`
 	Attachments  []AttachmentFK    `bson:"attachments" json:"attachments"`
 	LogTime      LogTime           `bson:"logTime" json:"logTime"`
 	Priority     TicketPriority    `bson:"priority" json:"priority"`

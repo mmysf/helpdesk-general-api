@@ -14,6 +14,7 @@ type ChangeDomainRequest struct {
 type UpdateProfileRequest struct {
 	Name     string `json:"name"`
 	Bio      string `json:"bio"`
+	Contact  string `json:"contact"`
 	AttachId string `json:"attachId"`
 }
 

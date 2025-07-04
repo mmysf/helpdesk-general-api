@@ -8,6 +8,7 @@ type TicketRequest struct {
 	Priority   string   `form:"priority"`
 	AttachIds  []string `form:"attachIds"`
 	ParentId   string   `form:"parentId"`
+	Name       string   `form:"name"`
 	ProjectId  string   `form:"projectId"`
 	CategoryId string   `form:"categoryId"`
 }

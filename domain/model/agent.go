@@ -15,6 +15,7 @@ type Agent struct {
 	JobTitle             string             `bson:"jobTitle" json:"jobTitle"`
 	ProfilePicture       MediaFK            `bson:"profilePicture" json:"profilePicture"`
 	Bio                  string             `bson:"bio" json:"bio"`
+	Contact              string             `bson:"contact" json:"contact"`
 	Role                 UserRole           `bson:"role" json:"role"`
 	Category             TicketCategoryFK   `bson:"category" json:"category"`
 	TotalTicketCompleted int64              `bson:"totalTicketCompleted" json:"totalTicketCompleted"`

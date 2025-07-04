@@ -319,6 +319,7 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 		Content:     payload.Content,
 		Code:        ticketCode,
 		Attachments: ticketAttachments,
+		Name:        payload.Name,
 		LogTime: model.LogTime{
 			StartAt:           nil,
 			EndAt:             nil,

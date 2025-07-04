@@ -222,6 +222,7 @@ func (u *agentUsecase) UpdateProfile(ctx context.Context, claim domain.JWTClaimA
 	// update profile
 	agent.Name = payload.Name
 	agent.Bio = payload.Bio
+	agent.Contact = payload.Contact
 
 	if err = u.mongodbRepo.UpdateAgent(ctx, agent); err != nil {
 		return response.Error(http.StatusBadRequest, err.Error())

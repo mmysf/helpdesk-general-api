@@ -53,8 +53,8 @@ func (u *appUsecase) Login(ctx context.Context, payload domain.LoginRequest) res
 
 	// check the db
 	user, err := u.mongodbRepo.FetchOneCustomer(ctx, map[string]interface{}{
-		"email":     payload.Email,
-		"companyID": company.ID.Hex(),
+		"email": payload.Email,
+		// "companyID": company.ID.Hex(),
 	})
 	if err != nil {
 		return response.Error(http.StatusInternalServerError, err.Error())
