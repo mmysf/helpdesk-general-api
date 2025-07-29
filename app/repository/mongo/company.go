@@ -55,6 +55,10 @@ func generateQueryFilterCompany(options map[string]interface{}, withOptions bool
 		query["name"] = regex
 	}
 
+	if subdomain, ok := options["subdomain"].(string); ok {
+		query["settings.domain.subdomain"] = subdomain
+	}
+
 	if code, ok := options["code"].(string); ok {
 		query["code"] = code
 	}

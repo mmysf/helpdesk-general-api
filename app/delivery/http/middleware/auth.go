@@ -111,11 +111,13 @@ func (m *appMiddleware) AuthCustomer() gin.HandlerFunc {
 			return
 		}
 		claims.Company = model.CompanyNested{
-			ID:    company.ID.Hex(),
-			Name:  company.Name,
-			Image: company.Logo.URL,
-			Type:  company.Type,
-			Code:  company.Code,
+			ID:       company.ID.Hex(),
+			Name:     company.Name,
+			Image:    company.Logo.URL,
+			Type:     company.Type,
+			Code:     company.Code,
+			LogoUrl:  company.Logo.URL,
+			Settings: company.Settings,
 		}
 
 		//check companyProduct
@@ -247,11 +249,13 @@ func (m *appMiddleware) AuthAgent() gin.HandlerFunc {
 			return
 		}
 		claims.Company = model.CompanyNested{
-			ID:    company.ID.Hex(),
-			Name:  company.Name,
-			Image: company.Logo.URL,
-			Type:  company.Type,
-			Code:  company.Code,
+			ID:       company.ID.Hex(),
+			Name:     company.Name,
+			Image:    company.Logo.URL,
+			Type:     company.Type,
+			Code:     company.Code,
+			LogoUrl:  company.Logo.URL,
+			Settings: company.Settings,
 		}
 
 		c.Set("token_data", *claims)

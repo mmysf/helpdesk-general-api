@@ -52,11 +52,13 @@ type CompanyDomain struct {
 }
 
 type CompanyNested struct {
-	ID    string `bson:"id" json:"id"`
-	Name  string `bson:"name" json:"name"`
-	Image string `bson:"image" json:"image"`
-	Type  string `bson:"type" json:"type"`
-	Code  string `bson:"code" json:"code"`
+	ID       string        `bson:"id" json:"id"`
+	Name     string        `bson:"name" json:"name"`
+	Image    string        `bson:"image" json:"image"`
+	Type     string        `bson:"type" json:"type"`
+	Code     string        `bson:"code" json:"code"`
+	LogoUrl  string        `bson:"logoUrl" json:"logoUrl"`
+	Settings CompanySeting `bson:"settings" json:"settings"`
 }
 
 // type CompanyProduct struct {

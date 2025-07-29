@@ -92,6 +92,10 @@ func (u *agentUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimA
 		fetchOptions["categoryID"] = query.Get("categoryID")
 	}
 
+	if query.Get("completedBy") != "" {
+		fetchOptions["completedBy"] = query.Get("completedBy")
+	}
+
 	// count first
 	totalDocuments := u.mongodbRepo.CountTicket(ctx, fetchOptions)
 
