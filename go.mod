@@ -19,6 +19,7 @@ require (
 	github.com/redis/go-redis/v9 v9.6.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.9.3
+	github.com/xuri/excelize/v2 v2.9.1
 	go.mongodb.org/mongo-driver v1.16.1
 	golang.org/x/crypto v0.38.0
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67
@@ -27,6 +28,14 @@ require (
 )
 
 require github.com/stretchr/testify v1.10.0 // indirect
+
+require (
+	github.com/richardlehane/mscfb v1.0.4 // indirect
+	github.com/richardlehane/msoleps v1.0.4 // indirect
+	github.com/tiendc/go-deepcopy v1.6.0 // indirect
+	github.com/xuri/efp v0.0.1 // indirect
+	github.com/xuri/nfp v0.0.1 // indirect
+)
 
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.4 // indirect
