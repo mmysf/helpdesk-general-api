@@ -23,10 +23,9 @@ func (u *appUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimUse
 	page, limit, offset := yurekahelpers.GetLimitOffset(query)
 
 	fetchOptions := map[string]interface{}{
-		"limit":            limit,
-		"offset":           offset,
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
+		"limit":     limit,
+		"offset":    offset,
+		"companyID": claim.CompanyID,
 	}
 
 	// filtering
@@ -180,9 +179,9 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 	var projectFK *model.ProjectFK
 	if payload.ProjectId != "" {
 		project, err := u.mongodbRepo.FetchOneProject(ctx, map[string]interface{}{
-			"id":               payload.ProjectId,
-			"companyID":        claim.CompanyID,
-			"companyProductID": claim.CompanyProductID,
+			"id":        payload.ProjectId,
+			"companyID": claim.CompanyID,
+			// "companyProductID": claim.CompanyProductID,
 		})
 		if err != nil {
 			return response.Error(http.StatusInternalServerError, err.Error())
@@ -191,9 +190,9 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 			return response.Error(http.StatusBadRequest, "project not found")
 		}
 		// check project owner
-		if project.CompanyProduct.ID != claim.CompanyProductID {
-			return response.Error(http.StatusBadRequest, "project is not owned by company product")
-		}
+		// if project.CompanyProduct.ID != claim.CompanyProductID {
+		// 	return response.Error(http.StatusBadRequest, "project is not owned by company product")
+		// }
 
 		projectFK = &model.ProjectFK{
 			ID:   project.ID.Hex(),
@@ -239,16 +238,16 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 
 	// count ticket
 	countTicket := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
-		"today":            true,
+		"companyID": claim.CompanyID,
+		// "companyProductID": claim.CompanyProductID,
+		"today": true,
 	})
 
 	// generate random char
-	randomChar := helpers.RandomChar(len(claim.CompanyProduct.Code))
+	randomChar := helpers.RandomChar(len(claim.Company.Code))
 
 	// generate ticket code
-	ticketCode := helpers.GenerateFormattedCode(claim.CompanyProduct.Code, countTicket+1, randomChar)
+	ticketCode := helpers.GenerateFormattedCode(claim.Company.Code, countTicket+1, randomChar)
 
 	// get detail cover media
 	ticketAttachments := make([]model.AttachmentFK, 0)
@@ -306,9 +305,9 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 
 	// create ticket
 	ticket := &model.Ticket{
-		ID:       primitive.NewObjectID(),
-		Company:  claim.Company,
-		Product:  claim.CompanyProduct,
+		ID:      primitive.NewObjectID(),
+		Company: claim.Company,
+		// Product:  claim.CompanyProduct,
 		Project:  projectFK,
 		Category: ticketCategoryFK,
 		Customer: model.CustomerFK{
@@ -320,6 +319,7 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 		Content:     payload.Content,
 		Code:        ticketCode,
 		Attachments: ticketAttachments,
+		Name:        payload.Name,
 		LogTime: model.LogTime{
 			StartAt:           nil,
 			EndAt:             nil,
@@ -415,6 +415,11 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 		agentEmails = append(agentEmails, row.Email)
 	}
 
+	// create notification
+	if err := u._createNotification(ctx, ticket, &ticket.Company); err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+
 	// send notification
 	go _sendTicketNotfication(config, ticket, agentEmails, company)
 
@@ -422,11 +427,50 @@ func (u *appUsecase) CreateTicket(ctx context.Context, claim domain.JWTClaimUser
 	u.mongodbRepo.IncrementOneCompany(ctx, company.ID.Hex(), map[string]int64{
 		"ticketTotal": 1,
 	})
-	u.mongodbRepo.IncrementOneCompanyProduct(ctx, customer.CompanyProduct.ID, map[string]int64{
+
+	u.mongodbRepo.IncrementOneCustomer(ctx, claim.UserID, map[string]int64{
 		"ticketTotal": 1,
 	})
+	// u.mongodbRepo.IncrementOneCompanyProduct(ctx, customer.CompanyProduct.ID, map[string]int64{
+	// 	"ticketTotal": 1,
+	// })
 
 	return response.Success(ticket)
+}
+
+func (u *appUsecase) _createNotification(ctx context.Context, ticket *model.Ticket, company *model.CompanyNested) (err error) {
+	// notif
+	var title string
+	var content string
+
+	title = "New ticket created"
+	content = ticket.Subject
+
+	// create notification
+	notification := &model.Notification{
+		ID:       primitive.NewObjectID(),
+		Company:  model.CompanyNested{ID: company.ID, Name: company.Name},
+		Title:    title,
+		Content:  content,
+		IsRead:   false,
+		UserRole: model.CustomerRole,
+		User:     model.UserNested(ticket.Customer),
+		Type:     model.TicketUpdated,
+		Ticket: model.TicketNested{
+			ID:      ticket.ID.Hex(),
+			Subject: ticket.Subject,
+		},
+		Category:  *ticket.Category,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	if err := u.mongodbRepo.CreateNotification(ctx, notification); err != nil {
+		logrus.Error(err)
+	}
+
+	return nil
+
 }
 
 func _sendTicketNotfication(config model.Config, ticket *model.Ticket, agentEmails []string, company *model.Company) {
@@ -441,7 +485,7 @@ func _sendTicketNotfication(config model.Config, ticket *model.Ticket, agentEmai
 		"customer_name":   ticket.Customer.Name,
 		"ticket_subject":  ticket.Subject,
 		"ticket_priority": string(ticket.Priority),
-		"brand_name":      ticket.Product.Name,
+		// "brand_name":      ticket.Product.Name,
 	}))
 
 	//send mail
@@ -460,9 +504,8 @@ func (u *appUsecase) GetTicketDetail(ctx context.Context, claim domain.JWTClaimU
 
 	// check ticket
 	ticket, err := u.mongodbRepo.FetchOneTicket(ctx, map[string]interface{}{
-		"id":               ticketID,
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
+		"id":        ticketID,
+		"companyID": claim.CompanyID,
 	})
 
 	if err != nil {
@@ -757,7 +800,7 @@ func _sendCloseTicketNotification(config model.Config, ticket *model.Ticket, age
 		"customer_name":   ticket.Customer.Name,
 		"ticket_subject":  ticket.Subject,
 		"ticket_priority": string(ticket.Priority),
-		"brand_name":      ticket.Product.Name,
+		// "brand_name":      ticket.Product.Name,
 	}))
 
 	//send mail
@@ -861,7 +904,7 @@ func (u *appUsecase) CreateTicketComment(ctx context.Context, claim domain.JWTCl
 	ticketComment := &model.TicketComment{
 		ID:      primitive.NewObjectID(),
 		Company: ticket.Company,
-		Product: ticket.Product,
+		// Product: ticket.Product,
 		Customer: model.CustomerFK{
 			ID:    claim.User.ID,
 			Name:  claim.User.Name,
@@ -905,11 +948,10 @@ func (u *appUsecase) GetTicketCommentList(ctx context.Context, claim domain.JWTC
 	page, limit, offset := yurekahelpers.GetLimitOffset(query)
 
 	fetchOptions := map[string]interface{}{
-		"limit":            limit,
-		"offset":           offset,
-		"ticketID":         ticketId,
-		"companyID":        claim.CompanyID,
-		"companyProductID": claim.CompanyProductID,
+		"limit":     limit,
+		"offset":    offset,
+		"ticketID":  ticketId,
+		"companyID": claim.CompanyID,
 	}
 
 	// filtering
@@ -1143,7 +1185,7 @@ func _sendReopenTicketNotification(config model.Config, ticket *model.Ticket, ag
 		"customer_name":   ticket.Customer.Name,
 		"ticket_subject":  ticket.Subject,
 		"ticket_priority": string(ticket.Priority),
-		"brand_name":      ticket.Product.Name,
+		// "brand_name":      ticket.Product.Name,
 	}))
 
 	//send mail

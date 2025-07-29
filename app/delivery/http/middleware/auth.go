@@ -111,36 +111,39 @@ func (m *appMiddleware) AuthCustomer() gin.HandlerFunc {
 			return
 		}
 		claims.Company = model.CompanyNested{
-			ID:    company.ID.Hex(),
-			Name:  company.Name,
-			Image: company.Logo.URL,
-			Type:  company.Type,
+			ID:       company.ID.Hex(),
+			Name:     company.Name,
+			Image:    company.Logo.URL,
+			Type:     company.Type,
+			Code:     company.Code,
+			LogoUrl:  company.Logo.URL,
+			Settings: company.Settings,
 		}
 
 		//check companyProduct
-		companyProduct, err := m.mongo.FetchOneCompanyProduct(c, map[string]interface{}{
-			"id": claims.CompanyProductID,
-		})
-		if err != nil {
-			c.AbortWithStatusJSON(
-				http.StatusInternalServerError,
-				response.Error(http.StatusInternalServerError, err.Error()),
-			)
-			return
-		}
-		if companyProduct == nil {
-			c.AbortWithStatusJSON(
-				http.StatusUnauthorized,
-				response.Error(http.StatusUnauthorized, "Unauthorized: Company product not found"),
-			)
-			return
-		}
-		claims.CompanyProduct = model.CompanyProductNested{
-			ID:    companyProduct.ID.Hex(),
-			Name:  companyProduct.Name,
-			Image: companyProduct.Logo.URL,
-			Code:  companyProduct.Code,
-		}
+		// companyProduct, err := m.mongo.FetchOneCompanyProduct(c, map[string]interface{}{
+		// 	"id": claims.CompanyProductID,
+		// })
+		// if err != nil {
+		// 	c.AbortWithStatusJSON(
+		// 		http.StatusInternalServerError,
+		// 		response.Error(http.StatusInternalServerError, err.Error()),
+		// 	)
+		// 	return
+		// }
+		// if companyProduct == nil {
+		// 	c.AbortWithStatusJSON(
+		// 		http.StatusUnauthorized,
+		// 		response.Error(http.StatusUnauthorized, "Unauthorized: Company product not found"),
+		// 	)
+		// 	return
+		// }
+		// claims.CompanyProduct = model.CompanyProductNested{
+		// 	ID:    companyProduct.ID.Hex(),
+		// 	Name:  companyProduct.Name,
+		// 	Image: companyProduct.Logo.URL,
+		// 	Code:  companyProduct.Code,
+		// }
 
 		c.Set("token_data", *claims)
 		c.Next()
@@ -246,10 +249,13 @@ func (m *appMiddleware) AuthAgent() gin.HandlerFunc {
 			return
 		}
 		claims.Company = model.CompanyNested{
-			ID:    company.ID.Hex(),
-			Name:  company.Name,
-			Image: company.Logo.URL,
-			Type:  company.Type,
+			ID:       company.ID.Hex(),
+			Name:     company.Name,
+			Image:    company.Logo.URL,
+			Type:     company.Type,
+			Code:     company.Code,
+			LogoUrl:  company.Logo.URL,
+			Settings: company.Settings,
 		}
 
 		c.Set("token_data", *claims)

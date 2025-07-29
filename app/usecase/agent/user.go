@@ -140,6 +140,9 @@ func (u *agentUsecase) CreateAgent(ctx context.Context, claim domain.JWTClaimAge
 	} else if !helpers.InArrayString(payload.Role, []string{"admin", "agent"}) {
 		errValidation["role"] = "role field must be admin or agent"
 	}
+	if payload.CategoryId == "" {
+		errValidation["category"] = "category field is required"
+	}
 
 	if len(errValidation) > 0 {
 		return response.ErrorValidation(errValidation, "error validation")
@@ -158,6 +161,18 @@ func (u *agentUsecase) CreateAgent(ctx context.Context, claim domain.JWTClaimAge
 		return response.Error(http.StatusBadRequest, "email already in use for "+agent.Company.Name)
 	}
 
+	//check category
+	category, err := u.mongodbRepo.FetchOneTicketCategory(ctx, map[string]interface{}{
+		"id":        payload.CategoryId,
+		"companyID": claim.CompanyID,
+	})
+	if err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+	if category == nil {
+		return response.Error(http.StatusBadRequest, "category not found")
+	}
+
 	password := helpers.RandomString(5)
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
@@ -170,6 +185,7 @@ func (u *agentUsecase) CreateAgent(ctx context.Context, claim domain.JWTClaimAge
 		Company:   claim.Company,
 		JobTitle:  payload.JobTitle,
 		Role:      model.UserRole(payload.Role),
+		Category:  model.TicketCategoryFK{ID: category.ID.Hex(), Name: category.Name},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -242,6 +258,9 @@ func (u *agentUsecase) UpdateAgent(ctx context.Context, claim domain.JWTClaimAge
 	} else if !helpers.InArrayString(payload.Role, []string{"admin", "agent"}) {
 		errValidation["role"] = "role field must be admin or agent"
 	}
+	if payload.CategoryId == "" {
+		errValidation["category"] = "category field is required"
+	}
 
 	if len(errValidation) > 0 {
 		return response.ErrorValidation(errValidation, "error validation")
@@ -269,11 +288,24 @@ func (u *agentUsecase) UpdateAgent(ctx context.Context, claim domain.JWTClaimAge
 		return response.Error(http.StatusBadRequest, "email already in use for "+existingAgent.Company.Name)
 	}
 
+	//check category
+	category, err := u.mongodbRepo.FetchOneTicketCategory(ctx, map[string]interface{}{
+		"id":        payload.CategoryId,
+		"companyID": claim.CompanyID,
+	})
+	if err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+	if category == nil {
+		return response.Error(http.StatusBadRequest, "category not found")
+	}
+
 	// update agent
 	agent.Name = payload.Name
 	agent.Email = payload.Email
 	agent.JobTitle = payload.JobTitle
 	agent.Role = model.UserRole(payload.Role)
+	agent.Category = model.TicketCategoryFK{ID: category.ID.Hex(), Name: category.Name}
 	agent.UpdatedAt = time.Now()
 
 	if err := u.mongodbRepo.UpdateOneAgent(
@@ -284,6 +316,7 @@ func (u *agentUsecase) UpdateAgent(ctx context.Context, claim domain.JWTClaimAge
 			"jobTitle":  agent.JobTitle,
 			"email":     agent.Email,
 			"role":      agent.Role,
+			"category":  agent.Category,
 			"updatedAt": agent.UpdatedAt,
 		}); err != nil {
 		return response.Error(http.StatusInternalServerError, err.Error())

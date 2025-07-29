@@ -33,7 +33,8 @@ func (u *appUsecase) GetCompanyDetailByDomain(ctx context.Context, options map[s
 
 	// check company
 	company, err := u.mongodbRepo.FetchOneCompany(ctx, map[string]interface{}{
-		"fullUrl": domain,
+		// "fullUrl": domain,
+		"subdomain": domain,
 	})
 
 	if err != nil {

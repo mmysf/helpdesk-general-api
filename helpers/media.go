@@ -4,7 +4,6 @@ import (
 	"app/domain/model"
 	"errors"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -79,7 +78,7 @@ func GenerateCleanName(originalName string) string {
 }
 
 func GeneratePublicURL(objectName string) string {
-	return os.Getenv("S3_ENDPOINT") + "/" + os.Getenv("S3_BUCKET_NAME") + "/" + objectName
+	return objectName
 }
 
 func GenerateLinkAttachment(attachments *[]model.AttachmentFK, s3 s3repo.S3Repo) (isUpdate bool, err error) {

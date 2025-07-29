@@ -51,6 +51,16 @@ func generateQueryFilterCustomer(options map[string]interface{}, withOptions boo
 		query["companyProduct.id"] = companyProductID
 	}
 
+	if search, ok := options["search"].(string); ok {
+		regex := bson.M{
+			"$regex": primitive.Regex{
+				Pattern: search,
+				Options: "i",
+			},
+		}
+		query["name"] = regex
+	}
+
 	if q, ok := options["q"].(string); ok {
 		regex := bson.M{
 			"$regex": primitive.Regex{
@@ -163,6 +173,20 @@ func (r *mongoDBRepo) CreateManyCustomer(ctx context.Context, rows []*model.Cust
 	_, err = r.Conn.Collection(r.CustomerCollection).InsertMany(ctx, docs)
 	if err != nil {
 		logrus.Error("CreateManyCustomer InsertMany:", err)
+		return
+	}
+	return
+}
+
+func (r *mongoDBRepo) IncrementOneCustomer(ctx context.Context, id string, payload map[string]int64) (err error) {
+	obj, _ := primitive.ObjectIDFromHex(id)
+	_, err = r.Conn.Collection(r.CustomerCollection).UpdateOne(context.Background(), map[string]any{
+		"_id": obj,
+	}, bson.M{
+		"$inc": payload,
+	})
+	if err != nil {
+		logrus.Error("IncrementOneCustomer UpdateOne:", err)
 		return
 	}
 	return

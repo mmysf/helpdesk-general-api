@@ -7,18 +7,19 @@ import (
 )
 
 type Company struct {
-	ID           primitive.ObjectID `bson:"_id" json:"id"`
-	AccessKey    string             `bson:"accessKey" json:"accessKey"`
-	Name         string             `bson:"name" json:"name"`
-	Bio          string             `bson:"bio" json:"bio"`
-	Type         string             `bson:"type" json:"type"`
-	ProductTotal int64              `bson:"productTotal" json:"productTotal"`
-	TicketTotal  int64              `bson:"ticketTotal" json:"ticketTotal"`
-	Logo         MediaFK            `bson:"logo" json:"logo"`
-	Settings     CompanySeting      `bson:"settings" json:"settings"`
-	CreatedAt    time.Time          `bson:"createdAt" json:"createdAt"`
-	UpdatedAt    time.Time          `bson:"updatedAt" json:"updatedAt"`
-	DeletedAt    *time.Time         `bson:"deletedAt" json:"-"`
+	ID            primitive.ObjectID `bson:"_id" json:"id"`
+	AccessKey     string             `bson:"accessKey" json:"accessKey"`
+	Name          string             `bson:"name" json:"name"`
+	Bio           string             `bson:"bio" json:"bio"`
+	Type          string             `bson:"type" json:"type"`
+	Code          string             `bson:"code" json:"code"`
+	CustomerTotal int64              `bson:"customerTotal" json:"customerTotal"`
+	TicketTotal   int64              `bson:"ticketTotal" json:"ticketTotal"`
+	Logo          MediaFK            `bson:"logo" json:"logo"`
+	Settings      CompanySeting      `bson:"settings" json:"settings"`
+	CreatedAt     time.Time          `bson:"createdAt" json:"createdAt"`
+	UpdatedAt     time.Time          `bson:"updatedAt" json:"updatedAt"`
+	DeletedAt     *time.Time         `bson:"deletedAt" json:"-"`
 }
 
 type CompanySeting struct {
@@ -51,28 +52,31 @@ type CompanyDomain struct {
 }
 
 type CompanyNested struct {
-	ID    string `bson:"id" json:"id"`
-	Name  string `bson:"name" json:"name"`
-	Image string `bson:"image" json:"image"`
-	Type  string `bson:"type" json:"type"`
+	ID       string        `bson:"id" json:"id"`
+	Name     string        `bson:"name" json:"name"`
+	Image    string        `bson:"image" json:"image"`
+	Type     string        `bson:"type" json:"type"`
+	Code     string        `bson:"code" json:"code"`
+	LogoUrl  string        `bson:"logoUrl" json:"logoUrl"`
+	Settings CompanySeting `bson:"settings" json:"settings"`
 }
 
-type CompanyProduct struct {
-	ID             primitive.ObjectID `bson:"_id" json:"id"`
-	Company        CompanyNested      `bson:"company" json:"company"`
-	Name           string             `bson:"name" json:"name"`
-	Code           string             `bson:"code" json:"code"`
-	Logo           MediaFK            `bson:"logo" json:"logo"`
-	TicketTotal    int64              `bson:"ticketTotal" json:"ticketTotal"`
-	CreatedAt      time.Time          `bson:"createdAt" json:"createdAt"`
-	UpdatedAt      time.Time          `bson:"updatedAt" json:"updatedAt"`
-	LastActivityAt *time.Time         `bson:"lastActivityAt" json:"lastActivityAt"`
-	DeletedAt      *time.Time         `bson:"deletedAt" json:"-"`
-}
+// type CompanyProduct struct {
+// 	ID             primitive.ObjectID `bson:"_id" json:"id"`
+// 	Company        CompanyNested      `bson:"company" json:"company"`
+// 	Name           string             `bson:"name" json:"name"`
+// 	Code           string             `bson:"code" json:"code"`
+// 	Logo           MediaFK            `bson:"logo" json:"logo"`
+// 	TicketTotal    int64              `bson:"ticketTotal" json:"ticketTotal"`
+// 	CreatedAt      time.Time          `bson:"createdAt" json:"createdAt"`
+// 	UpdatedAt      time.Time          `bson:"updatedAt" json:"updatedAt"`
+// 	LastActivityAt *time.Time         `bson:"lastActivityAt" json:"lastActivityAt"`
+// 	DeletedAt      *time.Time         `bson:"deletedAt" json:"-"`
+// }
 
-type CompanyProductNested struct {
-	ID    string `bson:"id" json:"id"`
-	Name  string `bson:"name" json:"name"`
-	Image string `bson:"image" json:"image"`
-	Code  string `bson:"code" json:"code"`
-}
+// type CompanyProductNested struct {
+// 	ID    string `bson:"id" json:"id"`
+// 	Name  string `bson:"name" json:"name"`
+// 	Image string `bson:"image" json:"image"`
+// 	Code  string `bson:"code" json:"code"`
+// }

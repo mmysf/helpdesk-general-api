@@ -241,6 +241,11 @@ func CustomCommonFilter(options map[string]any) (query map[string]any) {
 		}
 	}
 
+	// completed by
+	if completedBy, ok := options["completedBy"].(string); ok && completedBy != "" {
+		query["completedBy.id"] = completedBy
+	}
+
 	return query
 }
 

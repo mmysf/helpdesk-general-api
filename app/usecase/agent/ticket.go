@@ -25,6 +25,14 @@ func (u *agentUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimA
 
 	page, limit, offset := yurekahelpers.GetLimitOffset(query)
 
+	//get agent
+	agent, err := u.mongodbRepo.FetchOneAgent(ctx, map[string]interface{}{
+		"id": claim.UserID,
+	})
+	if err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+
 	fetchOptions := map[string]interface{}{
 		"limit":     limit,
 		"offset":    offset,
@@ -32,6 +40,10 @@ func (u *agentUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimA
 	}
 
 	// filtering
+	if agent.Role == "agent" {
+		fetchOptions["categoryID"] = agent.Category.ID
+	}
+
 	if query.Get("sort") != "" {
 		fetchOptions["sort"] = query.Get("sort")
 	}
@@ -78,6 +90,10 @@ func (u *agentUsecase) GetTicketList(ctx context.Context, claim domain.JWTClaimA
 
 	if query.Get("categoryID") != "" {
 		fetchOptions["categoryID"] = query.Get("categoryID")
+	}
+
+	if query.Get("completedBy") != "" {
+		fetchOptions["completedBy"] = query.Get("completedBy")
 	}
 
 	// count first
@@ -420,7 +436,7 @@ func (u *agentUsecase) StartLoggingTicket(ctx context.Context, claim domain.JWTC
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -500,7 +516,7 @@ func (u *agentUsecase) StopLoggingTicket(ctx context.Context, claim domain.JWTCl
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -722,7 +738,7 @@ func (u *agentUsecase) ResumeLoggingTicket(ctx context.Context, claim domain.JWT
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -921,12 +937,12 @@ func (u *agentUsecase) CreateTicketComment(ctx context.Context, claim domain.JWT
 	ticketComment := &model.TicketComment{
 		ID:      primitive.NewObjectID(),
 		Company: claim.Company,
-		Product: model.CompanyProductNested{
-			ID:    ticket.Product.ID,
-			Name:  ticket.Product.Name,
-			Image: ticket.Product.Image,
-			Code:  ticket.Product.Code,
-		},
+		// Product: model.CompanyProductNested{
+		// 	ID:    ticket.Product.ID,
+		// 	Name:  ticket.Product.Name,
+		// 	Image: ticket.Product.Image,
+		// 	Code:  ticket.Product.Code,
+		// },
 		Agent: model.AgentNested{
 			ID:   claim.User.ID,
 			Name: claim.User.Name,
@@ -1165,7 +1181,7 @@ func (u *agentUsecase) EditTimeTrack(ctx context.Context, claim domain.JWTClaimA
 		ID:       primitive.NewObjectID(),
 		Company:  ticket.Company,
 		Customer: ticket.Customer,
-		Product:  ticket.Product,
+		// Product:  ticket.Product,
 		Ticket: model.TicketNested{
 			ID:       ticket.ID.Hex(),
 			Subject:  ticket.Subject,
@@ -1208,7 +1224,7 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,
@@ -1248,7 +1264,7 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,
@@ -1274,6 +1290,12 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 
 			ticket.LogTime.EndAt = &now
 
+			//get agent
+			ticketAgent, err := u.mongodbRepo.FetchOneAgent(ctx, map[string]interface{}{"id": agent.ID})
+			if err != nil {
+				return err
+			}
+
 			//init logs end time
 			logsEndAt := now
 
@@ -1298,9 +1320,21 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 			ticket.ReminderSent = true
 			ticket.Token = defaultToken
 			ticket.Status = model.Resolve
+			ticket.CompletedBy = &model.AgentNested{
+				ID:    ticketAgent.ID.Hex(),
+				Name:  ticketAgent.Name,
+				Email: ticketAgent.Email,
+			}
 			ticket.UpdatedAt = now
 
+			ticketAgent.TotalTicketCompleted++
+			ticketAgent.UpdatedAt = now
+
 			if err := u.mongodbRepo.UpdateTicket(ctx, ticket); err != nil {
+				return err
+			}
+
+			if err := u.mongodbRepo.UpdateAgent(ctx, ticketAgent); err != nil {
 				return err
 			}
 
@@ -1337,7 +1371,59 @@ func (u *agentUsecase) _updateTicketAndTimelog(ctx context.Context, ticket *mode
 		}
 	}
 
+	// create notification
+	if err := u._createNotification(ctx, ticket, &ticket.Company); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (u *agentUsecase) _createNotification(ctx context.Context, ticket *model.Ticket, company *model.CompanyNested) (err error) {
+	// notif
+	var title string
+	var content string
+
+	if ticket.Status == model.Open {
+		title = "Status ticket change"
+		content = "Ticket opened"
+	}
+
+	if ticket.Status == model.InProgress {
+		title = "Status ticket change"
+		content = "Ticket in progress"
+	}
+
+	if ticket.Status == model.Resolve {
+		title = "Status ticket change"
+		content = "Ticket resolved"
+	}
+
+	// create notification
+	notification := &model.Notification{
+		ID:       primitive.NewObjectID(),
+		Company:  model.CompanyNested{ID: company.ID, Name: company.Name},
+		Title:    title,
+		Content:  content,
+		IsRead:   false,
+		UserRole: model.AgentRole,
+		User:     model.UserNested(ticket.Customer),
+		Type:     model.TicketUpdated,
+		Ticket: model.TicketNested{
+			ID:      ticket.ID.Hex(),
+			Subject: ticket.Subject,
+		},
+		Category:  *ticket.Category,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	if err := u.mongodbRepo.CreateNotification(ctx, notification); err != nil {
+		logrus.Error(err)
+	}
+
+	return nil
+
 }
 
 func _sendConfirmCloseTicketNotification(config model.Config, ticket *model.Ticket, company *model.Company) {
@@ -1460,7 +1546,7 @@ func (u *agentUsecase) ExportTicketsToCSV(ctx context.Context, claim domain.JWTC
 	defer csvWriter.Flush()
 
 	// Write CSV headers
-	err = csvWriter.Write([]string{"ID", "Company", "Product", "Customer", "Subject", "Code", "Status", "Priority", "CreatedAt", "ClosedAt\\n"})
+	err = csvWriter.Write([]string{"ID", "Company", "Customer", "Subject", "Code", "Status", "Priority", "CreatedAt", "ClosedAt\\n"})
 	if err != nil {
 		return response.Error(http.StatusInternalServerError, "Error writing CSV header")
 	}
@@ -1483,7 +1569,7 @@ func (u *agentUsecase) ExportTicketsToCSV(ctx context.Context, claim domain.JWTC
 		row := []string{
 			ticket.ID.Hex(),
 			ticket.Company.Name,
-			ticket.Product.Name,
+			// ticket.Product.Name,
 			ticket.Customer.Name,
 			ticket.Subject,
 			ticket.Code,
@@ -1644,25 +1730,25 @@ func (u *agentUsecase) GetTotalTicketCustomer(ctx context.Context, claim domain.
 	defer cancel()
 
 	total := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"companyProductID": options["id"],
-		"companyID":        claim.CompanyID,
+		// "companyProductID": options["id"],
+		"companyID": claim.CompanyID,
 	})
 
 	totalOpen := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"open"},
-		"companyID":        claim.CompanyID,
-		"companyProductID": options["id"],
+		"status":    []string{"open"},
+		"companyID": claim.CompanyID,
+		// "companyProductID": options["id"],
 	})
 
 	totalInProgress := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"in_progress"},
-		"companyID":        claim.CompanyID,
-		"companyProductID": options["id"],
+		"status":    []string{"in_progress"},
+		"companyID": claim.CompanyID,
+		// "companyProductID": options["id"],
 	})
 
 	totalClosed := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"closed"},
-		"companyProductID": options["id"],
+		"status": []string{"closed"},
+		// "companyProductID": options["id"],
 	})
 
 	result := map[string]interface{}{

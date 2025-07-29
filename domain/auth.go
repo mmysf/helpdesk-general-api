@@ -42,4 +42,5 @@ type AccountRequest struct {
 	Email            string `json:"email"`
 	CompanyID        string `json:"companyId"`
 	CompanyProductID string `json:"companyProductId"`
+	Category         string `json:"category"`
 }

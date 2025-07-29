@@ -304,12 +304,12 @@ func (u *superadminUsecase) CreateTicketComment(ctx context.Context, claim domai
 			Image: ticket.Company.Image,
 			Type:  ticket.Company.Type,
 		},
-		Product: model.CompanyProductNested{
-			ID:    ticket.Product.ID,
-			Name:  ticket.Product.Name,
-			Image: ticket.Product.Image,
-			Code:  ticket.Product.Code,
-		},
+		// Product: model.CompanyProductNested{
+		// 	ID:    ticket.Product.ID,
+		// 	Name:  ticket.Product.Name,
+		// 	Image: ticket.Product.Image,
+		// 	Code:  ticket.Product.Code,
+		// },
 		Agent: agentNested,
 		Ticket: model.TicketNested{
 			ID:      ticket.ID.Hex(),
@@ -384,7 +384,7 @@ func (u *superadminUsecase) _updateTicketAndTimelog(ctx context.Context, ticket 
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,
@@ -424,7 +424,7 @@ func (u *superadminUsecase) _updateTicketAndTimelog(ctx context.Context, ticket 
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,
@@ -496,7 +496,7 @@ func (u *superadminUsecase) _updateTicketAndTimelog(ctx context.Context, ticket 
 				ID:       primitive.NewObjectID(),
 				Company:  ticket.Company,
 				Customer: ticket.Customer,
-				Product:  ticket.Product,
+				// Product:  ticket.Product,
 				Ticket: model.TicketNested{
 					ID:       ticket.ID.Hex(),
 					Subject:  ticket.Subject,

@@ -45,6 +45,24 @@ func generateQueryFilterCompany(options map[string]interface{}, withOptions bool
 		query["name"] = name
 	}
 
+	if search, ok := options["search"].(string); ok {
+		regex := bson.M{
+			"$regex": primitive.Regex{
+				Pattern: search,
+				Options: "i",
+			},
+		}
+		query["name"] = regex
+	}
+
+	if subdomain, ok := options["subdomain"].(string); ok {
+		query["settings.domain.subdomain"] = subdomain
+	}
+
+	if code, ok := options["code"].(string); ok {
+		query["code"] = code
+	}
+
 	if q, ok := options["q"].(string); ok {
 		regex := bson.M{
 			"$regex": primitive.Regex{

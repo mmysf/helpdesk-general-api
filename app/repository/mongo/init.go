@@ -29,6 +29,7 @@ type mongoDBRepo struct {
 	MediaCollection                  string
 	TicketCategoryCollection         string
 	ServerPackageCollection          string
+	NotificationCollection           string
 }
 
 func NewMongodbRepo(Conn *mongo.Database) MongoDBRepo {
@@ -53,6 +54,7 @@ func NewMongodbRepo(Conn *mongo.Database) MongoDBRepo {
 		MediaCollection:                  "medias",
 		TicketCategoryCollection:         "ticket_categories",
 		ServerPackageCollection:          "server_packages",
+		NotificationCollection:           "notification",
 	}
 }
 
@@ -66,6 +68,7 @@ type MongoDBRepo interface {
 	UpdateOneCustomer(ctx context.Context, query, payload map[string]interface{}) (err error)
 	UpdatePartialCustomer(ctx context.Context, options, field map[string]interface{}) (err error)
 	UpdateManyPartialCustomer(ctx context.Context, ids []primitive.ObjectID, field map[string]interface{}) (err error)
+	IncrementOneCustomer(ctx context.Context, id string, payload map[string]int64) (err error)
 
 	// Agent
 	FetchOneAgent(ctx context.Context, options map[string]interface{}) (*model.Agent, error)
@@ -90,15 +93,15 @@ type MongoDBRepo interface {
 	IncrementOneCompany(ctx context.Context, id string, payload map[string]int64) (err error)
 	DeleteCompany(ctx context.Context, company *model.Company) (err error)
 
-	// CompanyProduct
-	CreateCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
-	UpdateCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
-	UpdatePartialCompanyProduct(ctx context.Context, options map[string]interface{}, field map[string]interface{}) (err error)
-	DeleteCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
-	FetchOneCompanyProduct(ctx context.Context, options map[string]interface{}) (*model.CompanyProduct, error)
-	FetchCompanyProductList(ctx context.Context, options map[string]interface{}) (*mongo.Cursor, error)
-	CountCompanyProduct(ctx context.Context, options map[string]interface{}) int64
-	IncrementOneCompanyProduct(ctx context.Context, id string, payload map[string]int64) (err error)
+	// // CompanyProduct
+	// CreateCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
+	// UpdateCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
+	// UpdatePartialCompanyProduct(ctx context.Context, options map[string]interface{}, field map[string]interface{}) (err error)
+	// DeleteCompanyProduct(ctx context.Context, company *model.CompanyProduct) (err error)
+	// FetchOneCompanyProduct(ctx context.Context, options map[string]interface{}) (*model.CompanyProduct, error)
+	// FetchCompanyProductList(ctx context.Context, options map[string]interface{}) (*mongo.Cursor, error)
+	// CountCompanyProduct(ctx context.Context, options map[string]interface{}) int64
+	// IncrementOneCompanyProduct(ctx context.Context, id string, payload map[string]int64) (err error)
 
 	// Ticket
 	FetchTicketList(ctx context.Context, options map[string]interface{}) (*mongo.Cursor, error)
@@ -193,4 +196,13 @@ type MongoDBRepo interface {
 	UpdateServerPackage(ctx context.Context, ServerPackages *model.ServerPackage) (err error)
 	DeleteServerPackage(ctx context.Context, ServerPackages *model.ServerPackage) (err error)
 	UpdatePartialServerPackage(ctx context.Context, options map[string]interface{}, field map[string]interface{}) (err error)
+
+	// Notification
+	CountNotification(ctx context.Context, options map[string]interface{}) int64
+	CreateNotification(ctx context.Context, row *model.Notification) (err error)
+	DeleteNotification(ctx context.Context, notification *model.Notification) (err error)
+	UpdateNotification(ctx context.Context, notification *model.Notification) (err error)
+	FetchNotificationList(ctx context.Context, options map[string]interface{}) (cursor *mongo.Cursor, err error)
+	FetchOneNotification(ctx context.Context, options map[string]interface{}) (*model.Notification, error)
+	ReadAllNotification(ctx context.Context, userID string) (err error)
 }

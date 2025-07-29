@@ -35,4 +35,6 @@ func NewCustomerHandler(route *gin.RouterGroup, middleware middleware.Middleware
 	handler.handleTicketCategoryRoute("/ticket-category")
 	handler.handleServerPackageRoute("/package/server")
 	handler.handleConfigRoute("/config")
+	handler.handleNotificationRoute("/notification")
+
 }

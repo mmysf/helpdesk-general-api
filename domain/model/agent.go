@@ -7,20 +7,23 @@ import (
 )
 
 type Agent struct {
-	ID                 primitive.ObjectID `bson:"_id" json:"id"`
-	Company            CompanyNested      `bson:"company" json:"company"`
-	Name               string             `bson:"name" json:"name"`
-	Email              string             `bson:"email" json:"email"`
-	Password           string             `bson:"password" json:"-"`
-	JobTitle           string             `bson:"jobTitle" json:"jobTitle"`
-	ProfilePicture     MediaFK            `bson:"profilePicture" json:"profilePicture"`
-	Bio                string             `bson:"bio" json:"bio"`
-	Role               UserRole           `bson:"role" json:"role"`
-	LastActivityAt     *time.Time         `bson:"lastActivityAt" json:"lastActivityAt"`
-	PasswordResetToken string             `bson:"passwordResetToken" json:"-"`
-	CreatedAt          time.Time          `bson:"createdAt" json:"createdAt"`
-	UpdatedAt          time.Time          `bson:"updatedAt" json:"updatedAt"`
-	DeletedAt          *time.Time         `bson:"deletedAt" json:"-"`
+	ID                   primitive.ObjectID `bson:"_id" json:"id"`
+	Company              CompanyNested      `bson:"company" json:"company"`
+	Name                 string             `bson:"name" json:"name"`
+	Email                string             `bson:"email" json:"email"`
+	Password             string             `bson:"password" json:"-"`
+	JobTitle             string             `bson:"jobTitle" json:"jobTitle"`
+	ProfilePicture       MediaFK            `bson:"profilePicture" json:"profilePicture"`
+	Bio                  string             `bson:"bio" json:"bio"`
+	Contact              string             `bson:"contact" json:"contact"`
+	Role                 UserRole           `bson:"role" json:"role"`
+	Category             TicketCategoryFK   `bson:"category" json:"category"`
+	TotalTicketCompleted int64              `bson:"totalTicketCompleted" json:"totalTicketCompleted"`
+	LastActivityAt       *time.Time         `bson:"lastActivityAt" json:"lastActivityAt"`
+	PasswordResetToken   string             `bson:"passwordResetToken" json:"-"`
+	CreatedAt            time.Time          `bson:"createdAt" json:"createdAt"`
+	UpdatedAt            time.Time          `bson:"updatedAt" json:"updatedAt"`
+	DeletedAt            *time.Time         `bson:"deletedAt" json:"-"`
 }
 
 type AgentNested struct {

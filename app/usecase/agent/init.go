@@ -62,7 +62,7 @@ type AgentUsecase interface {
 	GetTicketCommentDetail(ctx context.Context, claim domain.JWTClaimAgent, commentId string) response.Base
 
 	// Product
-	GetProductList(ctx context.Context, claim domain.JWTClaimAgent, query url.Values) response.Base
+	// GetProductList(ctx context.Context, claim domain.JWTClaimAgent, query url.Values) response.Base
 
 	// Attachment
 	UploadAttachment(ctx context.Context, claim domain.JWTClaimAgent, payload domain.UploadAttachment, request *http.Request) response.Base
@@ -84,12 +84,12 @@ type AgentUsecase interface {
 	GetDataCustomerTicket(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
 
 	// company product
-	UploadCompanyProductLogo(ctx context.Context, claim domain.JWTClaimAgent, payload domain.UploadAttachment, request *http.Request) response.Base
-	GetCompanyProductList(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
-	GetCompanyProductDetail(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
-	CreateCompanyProduct(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
-	UpdateCompanyProduct(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
-	DeleteCompanyProduct(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
+	// UploadCompanyProductLogo(ctx context.Context, claim domain.JWTClaimAgent, payload domain.UploadAttachment, request *http.Request) response.Base
+	// GetCompanyProductList(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
+	// GetCompanyProductDetail(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
+	// CreateCompanyProduct(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
+	// UpdateCompanyProduct(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
+	// DeleteCompanyProduct(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
 
 	// Customer
 	GetCustomerList(ctx context.Context, claim domain.JWTClaimAgent, options map[string]interface{}) response.Base
@@ -124,4 +124,10 @@ type AgentUsecase interface {
 	CreateTicketCategory(ctx context.Context, claim domain.JWTClaimAgent, payload domain.TicketCategoryRequest) response.Base
 	UpdateTicketCategory(ctx context.Context, claim domain.JWTClaimAgent, id string, payload domain.TicketCategoryRequest) response.Base
 	DeleteTicketCategory(ctx context.Context, claim domain.JWTClaimAgent, id string) response.Base
+
+	// Notification
+	GetNotificationList(ctx context.Context, claim domain.JWTClaimAgent, query url.Values) response.Base
+	GetNotificationDetail(ctx context.Context, claim domain.JWTClaimAgent, id string) response.Base
+	ReadAllNotification(ctx context.Context, claim domain.JWTClaimAgent) response.Base
+	GetNotificationCount(ctx context.Context, claim domain.JWTClaimAgent) response.Base
 }

@@ -18,12 +18,11 @@ func (u *appUsecase) GetTotalTicket(ctx context.Context, claim domain.JWTClaimUs
 
 	// filter
 	fetchOption := map[string]interface{}{
-		"companyProductID": claim.CompanyProductID,
-		"companyID":        claim.CompanyID,
+		"companyID": claim.CompanyID,
 	}
 
 	// filter user if b2c company
-	if claim.Company.Type == "B2C" {
+	if claim.Company.Type == "B2B" {
 		fetchOption["customerID"] = claim.UserID
 	}
 
@@ -75,24 +74,24 @@ func (u *appUsecase) GetTotalTicketNow(ctx context.Context, claim domain.JWTClai
 	endOfDay := startOfDay.Add(24 * time.Hour)
 
 	totalOpen := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"open"},
-		"companyProductID": claim.CompanyProductID,
-		"startDate":        startOfDay,
-		"endDate":          endOfDay,
+		"status": []string{"open"},
+		// "companyProductID": claim.CompanyProductID,
+		"startDate": startOfDay,
+		"endDate":   endOfDay,
 	})
 
 	totalInProgress := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"in_progress"},
-		"companyProductID": claim.CompanyProductID,
-		"startDate":        startOfDay,
-		"endDate":          endOfDay,
+		"status": []string{"in_progress"},
+		// "companyProductID": claim.CompanyProductID,
+		"startDate": startOfDay,
+		"endDate":   endOfDay,
 	})
 
 	totalClosed := u.mongodbRepo.CountTicket(ctx, map[string]interface{}{
-		"status":           []string{"closed"},
-		"companyProductID": claim.CompanyProductID,
-		"startDate":        startOfDay,
-		"endDate":          endOfDay,
+		"status": []string{"closed"},
+		// "companyProductID": claim.CompanyProductID,
+		"startDate": startOfDay,
+		"endDate":   endOfDay,
 	})
 
 	result := map[string]interface{}{
@@ -109,18 +108,18 @@ func (u *appUsecase) GetDataDashboard(ctx context.Context, claim domain.JWTClaim
 	defer cancel()
 
 	filterOpen := map[string]interface{}{
-		"status":           []string{"open"},
-		"companyProductID": claim.CompanyProductID,
+		"status": []string{"open"},
+		// "companyProductID": claim.CompanyProductID,
 	}
 
 	filterInProgress := map[string]interface{}{
-		"status":           []string{"in_progress"},
-		"companyProductID": claim.CompanyProductID,
+		"status": []string{"in_progress"},
+		// "companyProductID": claim.CompanyProductID,
 	}
 
 	filterClosed := map[string]interface{}{
-		"status":           []string{"closed"},
-		"companyProductID": claim.CompanyProductID,
+		"status": []string{"closed"},
+		// "companyProductID": claim.CompanyProductID,
 	}
 
 	responseDay := make([]map[string]interface{}, 0)
@@ -152,8 +151,8 @@ func (u *appUsecase) GetAverageDurationDashboard(ctx context.Context, claim doma
 	defer cancel()
 
 	fetchOptions := map[string]interface{}{
-		"status":           []string{"closed"},
-		"companyProductID": claim.CompanyProductID,
+		"status": []string{"closed"},
+		// "companyProductID": claim.CompanyProductID,
 	}
 
 	// Get current date

@@ -5,10 +5,12 @@ import (
 	"app/domain/model"
 	"app/helpers"
 	"context"
+	"fmt"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	yurekahelpers "github.com/Yureka-Teknologi-Cipta/yureka/helpers"
@@ -42,6 +44,10 @@ func (u *superadminUsecase) GetCompanyList(ctx context.Context, claim domain.JWT
 
 	if paramQuery.Get("q") != "" {
 		fetchOptions["q"] = paramQuery.Get("q")
+	}
+
+	if paramQuery.Get("search") != "" {
+		fetchOptions["search"] = paramQuery.Get("search")
 	}
 
 	// count first
@@ -275,6 +281,13 @@ func (u *superadminUsecase) CreateCompany(ctx context.Context, claim domain.JWTC
 		return response.Error(http.StatusBadRequest, "email already in use for agent "+agent.Company.Name)
 	}
 
+	// generate code
+	code, err := u._generateCode(payload.Name)
+
+	if err != nil {
+		return response.Error(http.StatusInternalServerError, err.Error())
+	}
+
 	// create company
 	company := model.Company{
 		ID:        primitive.NewObjectID(),
@@ -282,6 +295,7 @@ func (u *superadminUsecase) CreateCompany(ctx context.Context, claim domain.JWTC
 		Name:      payload.Name,
 		Bio:       "",
 		Type:      "B2B",
+		Code:      code,
 		Logo: model.MediaFK{
 			ID:          logo.ID.Hex(),
 			Name:        logo.Name,
@@ -337,10 +351,13 @@ func (u *superadminUsecase) CreateCompany(ctx context.Context, claim domain.JWTC
 		Password: string(hashedPassword),
 		Role:     model.AdminRole,
 		Company: model.CompanyNested{
-			ID:    company.ID.Hex(),
-			Name:  company.Name,
-			Image: company.Logo.URL,
-			Type:  company.Type,
+			ID:       company.ID.Hex(),
+			Name:     company.Name,
+			Image:    company.Logo.URL,
+			Type:     company.Type,
+			Code:     company.Code,
+			LogoUrl:  company.Logo.URL,
+			Settings: company.Settings,
 		},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -359,6 +376,56 @@ func (u *superadminUsecase) CreateCompany(ctx context.Context, claim domain.JWTC
 	})
 
 	return response.Success(company)
+}
+
+func (u *superadminUsecase) _generateCode(name string) (string, error) {
+	words := strings.Fields(name)
+	baseCode := ""
+
+	// Take first letters of words
+	for _, word := range words {
+		if len(baseCode) < 3 && len(word) > 0 {
+			baseCode += strings.ToUpper(string(word[0]))
+		}
+	}
+
+	if len(baseCode) < 3 && len(words) > 0 {
+		firstWord := strings.ToUpper(words[0])
+		for i := 1; len(baseCode) < 3 && i < len(firstWord); i++ {
+			baseCode += string(firstWord[i])
+		}
+	}
+
+	for i := -1; i < 10000; i++ {
+		code := baseCode
+		if i >= 0 {
+			code = baseCode + letterSuffix(i)
+		}
+
+		company, err := u.mongodbRepo.FetchOneCompany(context.Background(), map[string]interface{}{
+			"code": code,
+		})
+		if err != nil {
+			return "", err
+		}
+		if company == nil {
+			return code, nil // unique!
+		}
+	}
+
+	return "", fmt.Errorf("unable to generate unique code for: %s", name)
+}
+
+func letterSuffix(n int) string {
+	result := ""
+	for n >= 0 {
+		result = string('A'+(n%26)) + result
+		n = n/26 - 1
+		if n < 0 {
+			break
+		}
+	}
+	return result
 }
 
 func _sendEmailAgentCrendential(config model.Config, agent model.Agent, password string, company *model.Company) {
@@ -581,12 +648,12 @@ func (u *superadminUsecase) UpdateCompany(ctx context.Context, claim domain.JWTC
 	}
 
 	// update company nested
-	go u.mongodbRepo.UpdatePartialCompanyProduct(ctx, map[string]any{
-		"companyID": company.ID.Hex(),
-	}, map[string]any{
-		"company.name":  payload.Name,
-		"company.image": company.Logo.URL,
-	})
+	// go u.mongodbRepo.UpdatePartialCompanyProduct(ctx, map[string]any{
+	// 	"companyID": company.ID.Hex(),
+	// }, map[string]any{
+	// 	"company.name":  payload.Name,
+	// 	"company.image": company.Logo.URL,
+	// })
 	go u.mongodbRepo.UpdatePartialAgent(ctx, map[string]any{
 		"companyID": company.ID.Hex(),
 	}, map[string]any{
